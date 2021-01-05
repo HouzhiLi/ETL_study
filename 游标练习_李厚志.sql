@@ -139,4 +139,6 @@ begin
                select * into v_emp from emp where empno = v.empno;
                dbms_output.put_line(v.empno || ', before: ' || v.sal || ', after: ' || v_emp.sal);
                end loop;
+               rollback;
                end;
+               
