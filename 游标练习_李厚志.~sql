@@ -70,12 +70,12 @@ begin
   open cur;
   loop
     fetch cur into v;
+    exit when cur%notfound;
     dbms_output.put_line(v.ename || ', ' ||  v.grade);
-    exit when cur%rowcount = 5;
     end loop;
     close cur;
     end;
-
+    
 --6、用带参数的游标输出部门编号为10， 30的员工信息。
 declare 
 cursor cur(dno number) is select * from emp where deptno = dno;
