@@ -207,13 +207,14 @@ begin
      dbms_output.put_line(c(i));
      end loop;
      end;
+
+----------------------------
      
 declare
    type ctype is table of number(3) index by pls_integer;
    c ctype;
    t ctype;
    i pls_integer;
-   
 begin
    c(1):=32;
    c(2):=12;
@@ -228,11 +229,83 @@ begin
    for i in c.first..c.last loop
      t(c(i)) := 1;
      end loop;
-     
-     i := t.first;
+      i := t.first;
      loop
        dbms_output.put_line(i);
        exit when i = t.last;
        i := t.next(i);
        end loop;
        end;
+
+2.嵌套表
+嵌套表：存储一组数据类型相同的数据，他的下标是连续的整数，可以在plsql代码块中，也可以创建在数据库中，使用前需要初始化和扩展（注意: bulk collect into 中不需要）
+
+嵌套表的定义语法：
+type 类型名 is table of  数据类型;
+
+使用步骤：
+1.声明变量
+2.初始化变量
+变量名 := 类型名（）--初始化一个空的嵌套表
+变量名 :=  类型名（值，值...） --初始化一个有值的嵌套表
+3.添加元素
+扩展
+变量名.extend(n)
+变量名（下标）:= 值
+遍历是使用for循环就可以
+
+declare
+--定义一个嵌套表类型
+type ttype is table of varchar2(30);
+--声明一个嵌套表变量
+t ttype;
+begin
+  t := ttype(); --初始化一个空的嵌套表
+  --t(1) := 'xt' ;-- 不允许直接赋值
+  --扩展
+  t.extend(1);
+  t(1) := 'xt';
+  t.extend(1);
+  t(2) := 'xx';
+  t.extend(1);
+  t(3) := 'xi';
+  
+  for i in t.first.. t.last loop
+    dbms_output.put_line(i||'-->'||t(i));
+    end loop;
+    end;
+    
+declare
+type ttype is table of varchar2(30);
+t ttype;
+begin
+  t := ttype('smith', 'alen', 'scott', 'king');
+  for i in t.first..t.last loop
+  dbms_output.put_line(i||'-->'||t(i));
+  end loop;
+  end;
+  
+declare
+type ttype is table of varchar2(30);
+t ttype;
+begin
+  select ename bulk collect into t from emp;
+  for i in t.first..t.last loop
+    dbms_output.put_line(t(i));
+    end loop;
+    end;  --自动进行初始化和扩展
+    
+declare
+type ttype is table of varchar2(30);
+t ttype;
+cursor cur is select ename from emp;
+begin
+  open cur;
+  fetch cur bulk collect into t; -- 不用循还，一行语句
+  close cur;
+  for i in t.first.. t.last loop
+    dbms_output.put_line(t(i));
+    end loop;
+  end; --  不用遍历
+  
+returning bulk collect into 变量; -- 返回几个列就需要几个变量保存，不能使用集合类型
