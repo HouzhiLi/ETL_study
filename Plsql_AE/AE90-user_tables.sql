@@ -205,3 +205,17 @@ create table sys_user_post(
 comment on table sys_user_post is '用户岗位关联表';
 comment on column sys_user_post.user_id is '用户ID';
 comment on column sys_user_post.post_id is '岗位ID';
+
+select c.DATA_LENGTH from user_tab_cols c;
+select * from user_col_comments;
+select t1.table_name as tn, t1.column_name as col, t1.data_type || '(' || t1.DATA_LENGTH || ')' as col,  t2.comments as c from user_tab_cols t1, user_col_comments t2 where t1.TABLE_NAME = t2.TABLE_NAME and t1.COLUMN_NAME = t2.COLUMN_NAME and t1.table_name like 'SYS%';
+declare
+v_tbname 
+
+declare
+v_ename emp.ename%type;
+begin
+  delete from emp where empno = 7369 returning ename into v_ename;
+  dbms_output.put_line(v_ename);
+  rollback;
+  end;
