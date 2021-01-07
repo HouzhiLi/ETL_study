@@ -1,41 +1,188 @@
-1.å†™ä¸€ä¸ªå­˜å‚¨è¿‡ç¨‹ï¼Œè¾“å…¥å‘˜å·¥ä¿¡æ¯ï¼Œåœ¨empè¡¨ä¸­æ’å…¥ä¸€æ¡å‘˜å·¥ä¿¡æ¯
-2.(å˜æ€é¢˜)å†™ä¸€ä¸ªå­˜å‚¨è¿‡ç¨‹ï¼Œè¾“å…¥ä¸€ä¸ªå­—ç¬¦ä¸²ï¼Œåœ¨å‘˜å·¥è¡¨ä¸­æ’å…¥ä¸€æ¡å‘˜å·¥ä¿¡æ¯ï¼Œå­—ç¬¦ä¸²æ ¼å¼
-å‘˜å·¥ç¼–å·,å§“å,å·¥ä½œ,ä¸Šçº§ç¼–å·,å…¥èŒæ—¶é—´,ä½£é‡‘,éƒ¨é—¨ç¼–å·
-3.å†™ä¸€ä¸ªå­˜å‚¨è¿‡ç¨‹ï¼Œæ ¹æ®è¾“å…¥çš„å‚æ•°,ä¿®æ”¹å‘˜å·¥ä¿¡æ¯ï¼Œ
- æ³¨ï¼šå¦‚æœåªè¾“å…¥å‘˜å·¥å§“åï¼Œé‚£ä¹ˆå°±åªä¿®æ”¹å§“å
-     å¦‚æœè¾“å…¥å¤šä¸ªå€¼ï¼Œåˆ™ä¿®æ”¹å‘˜å·¥çš„å¤šä¸ªä¿¡æ¯
-     ä¾‹å¦‚ï¼šè¾“å…¥å‘˜å·¥çš„å§“åã€å·¥ä½œã€å·¥èµ„ï¼Œåˆ™è¦æ±‚
-     æŠŠå§“åã€å·¥ä½œã€å·¥èµ„ä¿¡æ¯éƒ½ä¿®æ”¹
-4.æŸ¥æ‰¾å‡ºå½“å‰ç”¨æˆ·æ¨¡å¼ä¸‹ï¼Œæ¯å¼ è¡¨çš„è®°å½•æ•°ï¼Œä»¥scottç”¨æˆ·ä¸ºä¾‹ï¼Œç»“æœåº”å¦‚ä¸‹ï¼š
+1.Ğ´Ò»¸ö´æ´¢¹ı³Ì£¬ÊäÈëÔ±¹¤ĞÅÏ¢£¬ÔÚemp±íÖĞ²åÈëÒ»ÌõÔ±¹¤ĞÅÏ¢
+
+create or replace procedure p1(v in emp%rowtype)
+is
+begin
+  insert into emp values (v.empno, v.ename, v.job, v.mgr, v.hiredate, v.sal, v.comm, v.deptno);
+  end;
+  
+declare
+  v emp%rowtype;
+  begin
+    v.empno := &empno;
+    v.ename := '&ename';
+    v.job := '&job';
+    v.mgr := &mgr;
+    v.hiredate := &hiredate;
+    v.sal := &sal;
+    v.comm := &comm;
+    v.deptno := &deptno;
+    p1(v);
+    end;
+
+2.(±äÌ¬Ìâ)Ğ´Ò»¸ö´æ´¢¹ı³Ì£¬ÊäÈëÒ»¸ö×Ö·û´®£¬ÔÚÔ±¹¤±íÖĞ²åÈëÒ»ÌõÔ±¹¤ĞÅÏ¢£¬×Ö·û´®¸ñÊ½
+Ô±¹¤±àºÅ,ĞÕÃû,¹¤×÷,ÉÏ¼¶±àºÅ,ÈëÖ°Ê±¼ä,Ó¶½ğ,²¿ÃÅ±àºÅ
+
+create or replace procedure p2(v in varchar2) is
+/*declare
+v varchar2(300) := '1111,takami,worker,222,19951109,500,50,10';*/
+begin
+  insert into emp
+  values
+    (substr(v, 1, instr(v, ',', 1, 1) - 1),
+     substr(v,
+            instr(v, ',', 1, 1) + 1,
+            instr(v, ',', 1, 2) - instr(v, ',', 1, 1) - 1),
+     substr(v,
+            instr(v, ',', 1, 2) + 1,
+            instr(v, ',', 1, 3) - instr(v, ',', 1, 2) - 1),
+     substr(v,
+            instr(v, ',', 1, 3) + 1,
+            instr(v, ',', 1, 4) - instr(v, ',', 1, 3) - 1),
+     to_date(substr(v,
+            instr(v, ',', 1, 4) + 1,
+            instr(v, ',', 1, 5) - instr(v, ',', 1, 4) - 1), 'yyyymmdd'),
+     substr(v,
+            instr(v, ',', 1, 5) + 1,
+            instr(v, ',', 1, 6) - instr(v, ',', 1, 5) - 1),
+     substr(v,
+            instr(v, ',', 1, 6) + 1,
+            instr(v, ',', 1, 7) - instr(v, ',', 1, 6) - 1),
+     substr(v,
+            instr(v, ',', 1, 7) + 1));
+end;
+----------------------------------------
+declare
+m varchar2(300);
+begin
+  m := '1111,takami,worker,222,19951109,500,50,10';
+  p2(m);
+  end;
+----------------------------------------
+call p2(&v);  
+select * from emp;
+
+  
+3.Ğ´Ò»¸ö´æ´¢¹ı³Ì£¬¸ù¾İÊäÈëµÄ²ÎÊı,ĞŞ¸ÄÔ±¹¤ĞÅÏ¢£¬
+ ×¢£ºÈç¹ûÖ»ÊäÈëÔ±¹¤ĞÕÃû£¬ÄÇÃ´¾ÍÖ»ĞŞ¸ÄĞÕÃû
+     Èç¹ûÊäÈë¶à¸öÖµ£¬ÔòĞŞ¸ÄÔ±¹¤µÄ¶à¸öĞÅÏ¢
+     ÀıÈç£ºÊäÈëÔ±¹¤µÄĞÕÃû¡¢¹¤×÷¡¢¹¤×Ê£¬ÔòÒªÇó
+     °ÑĞÕÃû¡¢¹¤×÷¡¢¹¤×ÊĞÅÏ¢¶¼ĞŞ¸Ä
+     create or replace procedure p3 (v emp%rowtype)
+     is
+     begin
+       update emp set ename = nvl(v.ename, ename), job = nvl(v.job, job), sal = nvl(v.sal, sal) where empno = v.empno;
+       end;
+       
+       declare
+       v emp%rowtype;
+       begin
+         v.empno := &empno;
+         v.ename := '&ename';
+         v.job := '&job';
+         v.mgr := &mgr;
+         v.hiredate := &hiredate;
+         v.sal := &sal;
+         v.comm := &comm;
+         v.deptno := &deptno;
+         p3(v);
+         end;
+         select * from emp;
+         
+4.²éÕÒ³öµ±Ç°ÓÃ»§Ä£Ê½ÏÂ£¬Ã¿ÕÅ±íµÄ¼ÇÂ¼Êı£¬ÒÔscottÓÃ»§ÎªÀı£¬½á¹ûÓ¦ÈçÏÂ£º
 DEPT...................................4
 EMP...................................14
 BONUS.................................0
 SALGRADE.............................5
-æç¤ºï¼šæŸ¥æ‰¾ç”¨æˆ·ä¸‹æ‰€æœ‰è¡¨åçš„sqlä¸ºselect table_name from user_tables;
-5.æŸccè¡¨æ•°æ®å¦‚ä¸‹ï¼š
+ÌáÊ¾£º²éÕÒÓÃ»§ÏÂËùÓĞ±íÃûµÄsqlÎªselect table_name from user_tables;
+
+/*create table ttt as select * from emp where 1=0;
+select * from emp;
+create or replace procedure p4 is
+begin
+  for i in (select ut.table_name tn, count(*) c
+              from user_tables ut, user_tab_cols ut_c
+             where ut.TABLE_NAME(+) = ut_c.TABLE_NAME
+             group by ut.TABLE_NAME) loop
+    -- select table_name tn, count(*) c from user_tables ut, user_tab_cols ut_c where ut.TABLE_NAME(+) = ut_c.TABLE_NAME  group by ut.TABLE_NAME;
+    dbms_output.put_line(i.tn || rpad('.', 50, '.') || i.c);
+  end loop;
+  end; 
+  call p4();*/
+  
+  create or replace procedure p4
+  is
+  begin
+    for i in (select * from user_tables) loop
+      dbms_output.put_line(i.table_name || rpad('.', 50, '.') || nvl(i.num_rows,0));
+      end loop;
+      end;
+    call p4();
+    
+   /* for i in (select table_name from user_tables ) loop
+      for n in (select count(1) from table(i.table_name)) loop
+      --dbms_output.put_line(i.table_name);
+     --select count(*) into n from i.table_name;
+       dbms_output.put_line(i.table_name || rpad('.', 50, '.') || n);
+       end loop;
+     end loop;
+     end;*/
+5.Ä³cc±íÊı¾İÈçÏÂ£º
 c1 c2
 --------------
-1 è¥¿
-1 å®‰
-1 çš„
-2 å¤©
-2 æ°”
-3 å¥½
-â€¦â€¦
-è½¬æ¢ä¸º
-1 è¥¿å®‰çš„
-2 å¤©æ°”
-3 å¥½
-è¦æ±‚ï¼šä¸èƒ½æ”¹å˜è¡¨ç»“æ„åŠæ•°æ®å†…å®¹
-6.åˆ›å»ºä¸€ä¸ªè¿‡ç¨‹ï¼Œèƒ½å‘deptè¡¨ä¸­æ·»åŠ ä¸€ä¸ªæ–°è®°å½•.ï¼ˆinå‚æ•°ï¼‰
-7.åˆ›å»ºä¸€ä¸ªè¿‡ç¨‹ï¼Œä»empè¡¨ä¸­å¸¦å…¥é›‡å‘˜çš„å§“åï¼Œè¿”å›è¯¥é›‡å‘˜çš„è–ªæ°´å€¼ã€‚ï¼ˆoutå‚æ•°ï¼‰
-8.å¯¹æ‰€æœ‰å‘˜å·¥,å¦‚æœè¯¥å‘˜å·¥èŒä½æ˜¯MANAGERï¼Œå¹¶ä¸”åœ¨DALLASå·¥ä½œé‚£ä¹ˆå°±ç»™ä»–è–ªé‡‘åŠ 15ï¼…ï¼›å¦‚æœè¯¥å‘˜å·¥èŒä½æ˜¯CLERKï¼Œå¹¶ä¸”åœ¨NEW YORKå·¥ä½œé‚£ä¹ˆå°±ç»™ä»–è–ªé‡‘æ‰£é™¤5ï¼…;å…¶ä»–æƒ…å†µä¸ä½œå¤„ç†
-å¯¹æ‰€æœ‰å‘˜å·¥,å¦‚æœè¯¥å‘˜å·¥éƒ¨é—¨æ˜¯SALESï¼Œå¹¶ä¸”å·¥èµ„å°‘äº1500é‚£ä¹ˆå°±ç»™ä»–è–ªé‡‘åŠ 15ï¼…ï¼›å¦‚æœè¯¥å‘˜å·¥éƒ¨é—¨æ˜¯RESEARCHï¼Œå¹¶ä¸”èŒä½æ˜¯CLERKé‚£ä¹ˆå°±ç»™ä»–è–ªé‡‘å¢åŠ 5ï¼…;å…¶ä»–æƒ…å†µä¸ä½œå¤„ç† 
-9.å¯¹ç›´æ¥ä¸Šçº§æ˜¯'BLAKE'çš„æ‰€æœ‰å‘˜å·¥ï¼ŒæŒ‰ç…§å‚åŠ å·¥ä½œçš„æ—¶é—´åŠ è–ªï¼š
-81å¹´6æœˆä»¥å‰çš„åŠ è–ª10ï¼…
-81å¹´6æœˆä»¥åçš„åŠ è–ª5ï¼…
-10.ç¼–å†™ä¸€PL/SQLï¼Œå¯¹æ‰€æœ‰çš„"é”€å”®å‘˜"(SALESMAN)å¢åŠ ä½£é‡‘500.
-11.ç¼–å†™ä¸€ä¸ªPL/SQLç¨‹åºå—ï¼Œå¯¹åå­—ä»¥"A"æˆ–"S"å¼€å§‹çš„æ‰€æœ‰é›‡å‘˜æŒ‰ä»–ä»¬çš„åŸºæœ¬è–ªæ°´çš„10%åŠ è–ªã€‚
-12.ç¼–å†™ä¸€PL/SQLï¼Œä»¥æå‡ä¸¤ä¸ªèµ„æ ¼æœ€è€çš„"èŒå‘˜"ä¸º"é«˜çº§èŒå‘˜"ã€‚ï¼ˆå·¥ä½œæ—¶é—´è¶Šé•¿ï¼Œä¼˜å…ˆçº§è¶Šé«˜ï¼‰
-13.æ˜¾ç¤ºEMPä¸­çš„ç¬¬å››æ¡è®°å½•ã€‚
-14.ç¼–å†™ä¸€ä¸ªç»™ç‰¹æ®Šé›‡å‘˜åŠ è–ª10%çš„è¿‡ç¨‹ï¼Œè¿™ä¹‹åï¼Œæ£€æŸ¥å¦‚æœå·²ç»é›‡ä½£è¯¥é›‡å‘˜è¶…è¿‡60ä¸ªæœˆï¼Œåˆ™ç»™ä»–é¢å¤–åŠ è–ª3000.
+1 Î÷
+1 °²
+1 µÄ
+2 Ìì
+2 Æø
+3 ºÃ
+¡­¡­
+×ª»»Îª
+1 Î÷°²µÄ
+2 ÌìÆø
+3 ºÃ
+ÒªÇó£º²»ÄÜ¸Ä±ä±í½á¹¹¼°Êı¾İÄÚÈİ
+create table cc(
+c1 number(2),
+c2 varchar2(20));
+select * from cc for update;
+
+declare
+cursor cur is select * from 
+    
+6.´´½¨Ò»¸ö¹ı³Ì£¬ÄÜÏòdept±íÖĞÌí¼ÓÒ»¸öĞÂ¼ÇÂ¼.£¨in²ÎÊı£©
+create or replace procedure p6(d in dept%rowtype)
+is
+begin
+  insert into dept values()
+  d.deptno := &deptno;
+  d.dname := '&dname';
+  d.loc := '&loc';
+  end
+7.´´½¨Ò»¸ö¹ı³Ì£¬´Óemp±íÖĞ´øÈë¹ÍÔ±µÄĞÕÃû£¬·µ»Ø¸Ã¹ÍÔ±µÄĞ½Ë®Öµ¡££¨out²ÎÊı£©
+8.¶ÔËùÓĞÔ±¹¤,Èç¹û¸ÃÔ±¹¤Ö°Î»ÊÇMANAGER£¬²¢ÇÒÔÚDALLAS¹¤×÷ÄÇÃ´¾Í¸øËûĞ½½ğ¼Ó15£¥£»Èç¹û¸ÃÔ±¹¤Ö°Î»ÊÇCLERK£¬²¢ÇÒÔÚNEW YORK¹¤×÷ÄÇÃ´¾Í¸øËûĞ½½ğ¿Û³ı5£¥;ÆäËûÇé¿ö²»×÷´¦Àí
+¶ÔËùÓĞÔ±¹¤,Èç¹û¸ÃÔ±¹¤²¿ÃÅÊÇSALES£¬²¢ÇÒ¹¤×ÊÉÙÓÚ1500ÄÇÃ´¾Í¸øËûĞ½½ğ¼Ó15£¥£»Èç¹û¸ÃÔ±¹¤²¿ÃÅÊÇRESEARCH£¬²¢ÇÒÖ°Î»ÊÇCLERKÄÇÃ´¾Í¸øËûĞ½½ğÔö¼Ó5£¥;ÆäËûÇé¿ö²»×÷´¦Àí 
+9.¶ÔÖ±½ÓÉÏ¼¶ÊÇ'BLAKE'µÄËùÓĞÔ±¹¤£¬°´ÕÕ²Î¼Ó¹¤×÷µÄÊ±¼ä¼ÓĞ½£º
+81Äê6ÔÂÒÔÇ°µÄ¼ÓĞ½10£¥
+81Äê6ÔÂÒÔºóµÄ¼ÓĞ½5£¥
+10.±àĞ´Ò»PL/SQL£¬¶ÔËùÓĞµÄ"ÏúÊÛÔ±"(SALESMAN)Ôö¼ÓÓ¶½ğ500.
+11.±àĞ´Ò»¸öPL/SQL³ÌĞò¿é£¬¶ÔÃû×ÖÒÔ"A"»ò"S"¿ªÊ¼µÄËùÓĞ¹ÍÔ±°´ËûÃÇµÄ»ù±¾Ğ½Ë®µÄ10%¼ÓĞ½¡£
+12.±àĞ´Ò»PL/SQL£¬ÒÔÌáÉıÁ½¸ö×Ê¸ñ×îÀÏµÄ"Ö°Ô±"Îª"¸ß¼¶Ö°Ô±"¡££¨¹¤×÷Ê±¼äÔ½³¤£¬ÓÅÏÈ¼¶Ô½¸ß£©
+
+13.ÏÔÊ¾EMPÖĞµÄµÚËÄÌõ¼ÇÂ¼¡£
+create or replace procedure p13(n in number)
+is 
+v emp%rowtype;
+--v_sql varchar2(300) := 'select * from (select emp.*, rownum rn from emp) t where t.rn = n'; 
+begin
+  select empno, ename, job, mgr, hiredate, sal, comm, deptno into v from (select emp.*, rownum rn from emp) t where t.rn = n;
+  dbms_output.put_line(v.empno|| ', ' || v.ename|| ', ' || v.job|| ', ' || v.mgr|| ', ' || v.hiredate|| ', ' || v.sal|| ', ' || v.comm|| ', ' || v.deptno);
+  end;
+ 
+call p13(4);
+    
+14.±àĞ´Ò»¸ö¸øÌØÊâ¹ÍÔ±¼ÓĞ½10%µÄ¹ı³Ì£¬ÕâÖ®ºó£¬¼ì²éÈç¹ûÒÑ¾­¹ÍÓ¶¸Ã¹ÍÔ±³¬¹ı60¸öÔÂ£¬Ôò¸øËû¶îÍâ¼ÓĞ½3000.
+create or replace procedure p1
+is
+begin
+  
