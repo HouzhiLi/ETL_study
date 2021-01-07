@@ -1,24 +1,142 @@
---1ã€ç”¨æ¸¸æ ‡æ˜¾ç¤ºæ‰€æœ‰éƒ¨é—¨ç¼–å·ä¸åç§°ï¼Œä»¥åŠå…¶æ‰€æ‹¥æœ‰çš„å‘˜å·¥äººæ•°ã€‚
---2ã€ç”¨æ¸¸æ ‡å±æ€§%rowcountå®ç°è¾“å‡ºå‰åä¸ªå‘˜å·¥çš„ä¿¡æ¯ã€‚
+--1¡¢ÓÃÓÎ±êÏÔÊ¾ËùÓĞ²¿ÃÅ±àºÅÓëÃû³Æ£¬ÒÔ¼°ÆäËùÓµÓĞµÄÔ±¹¤ÈËÊı¡£
+declare
+cursor cur is select d.deptno dno, d.dname, count(1) nums from dept d, emp e where d.deptno = e.deptno(+) group by d.deptno, d.dname;
+v cur%rowtype;
+begin
+  open cur;
+  loop
+    fetch cur into v;
+    exit when cur%notfound;
+    dbms_output.put_line(v.dno|| ', ' || v.dname|| ', ' || v.nums);
+    end loop;
+    close cur;
+    end;
+    
+--2¡¢ÓÃÓÎ±êÊôĞÔ%rowcountÊµÏÖÊä³öÇ°Ê®¸öÔ±¹¤µÄĞÅÏ¢¡£
 
---3ã€é€šè¿‡ä½¿ç”¨æ¸¸æ ‡æ¥æ˜¾ç¤ºdeptè¡¨ä¸­çš„éƒ¨é—¨åç§°ï¼ŒåŠå…¶ç›¸åº”çš„å‘˜å·¥åˆ—è¡¨ï¼ˆæç¤ºï¼šå¯ä»¥ä½¿ç”¨åŒé‡å¾ªç¯ï¼‰ã€‚
+declare
+cursor cur is select * from emp;
+v cur%rowtype;
+begin
+  open cur;
+  loop
+    fetch cur into v;
+    dbms_output.put_line(v.empno|| ', ' || v.ename|| ', ' || v.job|| ', ' || v.deptno|| ', ' || v.mgr|| ', ' || v.sal|| ', ' || v.comm|| ', ' || v.hiredate);
+    exit when cur%rowcount = 10;
+    end loop;
+    close cur;
+    end;
+    
+--3¡¢Í¨¹ıÊ¹ÓÃÓÎ±êÀ´ÏÔÊ¾dept±íÖĞµÄ²¿ÃÅÃû³Æ£¬¼°ÆäÏàÓ¦µÄÔ±¹¤ÁĞ±í£¨ÌáÊ¾£º¿ÉÒÔÊ¹ÓÃË«ÖØÑ­»·£©¡£
+declare
+cursor cur1 is select deptno, dname from dept;
+begin
+  for v in cur1 loop
+     dbms_output.put_line(v.dname);
+     for m in (select * from emp where deptno = v.deptno) loop
+       dbms_output.put_line(m.empno|| ', ' || m.ename|| ', ' || m.deptno);
+       end loop;
+       end loop;
+       end;
+       ------------------
+declare
+cursor cur1 is select deptno, dname from dept;
+cursor cur2 (dno number) is select * from emp where deptno = dno;
+begin
+  for v in cur1 loop
+    dbms_output.put_line(v.dname);
+    for m in cur2(v.deptno) loop
+       dbms_output.put_line(m.empno|| ', ' || m.ename|| ', ' || m.deptno);
+      end loop;
+      end loop;
+      end;
+      
+--4¡¢½ÓÊÜÒ»¸ö²¿ÃÅºÅ£¬Ê¹ÓÃForÑ­»·£¬´Óemp±íÖĞÏÔÊ¾¸Ã²¿ÃÅµÄËùÓĞ¹ÍÔ±µÄĞÕÃû£¬¹¤×÷ºÍĞ½Ë®¡£
+declare
+v_dno number := &dno;
+cursor cur is select ename, job, sal from emp where deptno = v_dno;
+begin
+  for v in cur loop
+    dbms_output.put_line(v.ename|| ', ' || v.job|| ', ' || v.sal);
+    end loop;
+    end;
 
---4ã€æ¥å—ä¸€ä¸ªéƒ¨é—¨å·ï¼Œä½¿ç”¨Forå¾ªç¯ï¼Œä»empè¡¨ä¸­æ˜¾ç¤ºè¯¥éƒ¨é—¨çš„æ‰€æœ‰é›‡å‘˜çš„å§“åï¼Œå·¥ä½œå’Œè–ªæ°´ã€‚
 
+--5¡¢±àĞ´Ò»¸ö³ÌĞò¿é£¬½«emp±íÖĞÇ°5ÈËµÄÃû×Ö£¬¼°Æä³öµÄ¹¤×ÊµÈ¼¶£¨salgrade£©ÏÔÊ¾³öÀ´¡£
+declare
+cursor cur is select e.ename, s.grade from emp e, salgrade s where e.sal between s.losal and s.hisal;
+v cur%rowtype;
+begin
+  open cur;
+  loop
+    fetch cur into v;
+    exit when cur%notfound;
+    dbms_output.put_line(v.ename || ', ' ||  v.grade);
+    end loop;
+    close cur;
+    end;
+    
+--6¡¢ÓÃ´ø²ÎÊıµÄÓÎ±êÊä³ö²¿ÃÅ±àºÅÎª10£¬ 30µÄÔ±¹¤ĞÅÏ¢¡£
+declare 
+cursor cur(dno number) is select * from emp where deptno = dno;
+begin
+  for v in cur(10) loop
+    dbms_output.put_line(v.empno|| ', ' || v.ename|| ', ' || v.job|| ', ' || v.sal|| ', ' || v.comm|| ', ' || v.mgr|| ', ' || v.deptno|| ', ' || v.hiredate);
+    end loop;
+    
+    for v in cur(30) loop
+    dbms_output.put_line(v.empno|| ', ' || v.ename|| ', ' || v.job|| ', ' || v.sal|| ', ' || v.comm|| ', ' || v.mgr|| ', ' || v.deptno|| ', ' || v.hiredate);
+    end loop;
+    end;
+    
+--7¡¢Ê¹ÓÃ´ø²ÎÊıµÄÓÎ±ê£¬ÊµÏÖ½ÓÊÜÒ»¸ö²¿ÃÅÃû³Æ£¬´Óemp±íÖĞÏÔÊ¾¸Ã²¿ÃÅµÄËùÓĞ¹ÍÔ±µÄĞÕÃû£¬¹¤×÷ºÍĞ½Ë®¡£
+declare
+v_dname dept.dname%type := '&dname';
+cursor cur(dept_name v_dname%type) is select e.ename, e.job, e.sal from emp e, dept d where e.deptno(+) = d.deptno and d.dname = dept_name;
+begin
+  for v in cur(v_dname) loop
+    dbms_output.put_line(v.ename|| ', ' || v.job|| ', ' || v.sal);
+    end loop;
+    end;
 
+--8¡¢ÓÃÓÎ±ê»ñÈ¡ËùÓĞÊÕÈë³¬¹ı2000µÄ salesman.
+declare
+cursor cur(v_sal number, v_job emp.job%type) is select * from emp where sal > v_sal and job = v_job;
+begin
+  for v in cur(2000, 'SALESMAN') loop
+    dbms_output.put_line(v.empno|| ', ' || v.ename|| ', ' || v.job|| ', ' || v.sal|| ', ' || v.comm|| ', ' || v.mgr|| ', ' || v.deptno|| ', ' || v.hiredate);
+    end loop;
+    end;
 
---5ã€ç¼–å†™ä¸€ä¸ªç¨‹åºå—ï¼Œå°†empè¡¨ä¸­å‰5äººçš„åå­—ï¼ŒåŠå…¶å‡ºçš„å·¥èµ„ç­‰çº§ï¼ˆsalgradeï¼‰æ˜¾ç¤ºå‡ºæ¥ã€‚
-
---6ã€ç”¨å¸¦å‚æ•°çš„æ¸¸æ ‡è¾“å‡ºéƒ¨é—¨ç¼–å·ä¸º10ï¼Œ 30çš„å‘˜å·¥ä¿¡æ¯ã€‚
-
---7ã€ä½¿ç”¨å¸¦å‚æ•°çš„æ¸¸æ ‡ï¼Œå®ç°æ¥å—ä¸€ä¸ªéƒ¨é—¨åç§°ï¼Œä»empè¡¨ä¸­æ˜¾ç¤ºè¯¥éƒ¨é—¨çš„æ‰€æœ‰é›‡å‘˜çš„å§“åï¼Œå·¥ä½œå’Œè–ªæ°´ã€‚
-
-
---8ã€ç”¨æ¸¸æ ‡è·å–æ‰€æœ‰æ”¶å…¥è¶…è¿‡2000çš„ salesman.
-
---9ã€ç¼–å†™ä¸€ä¸ªPL/SQLç¨‹åºå—ï¼Œä»empè¡¨ä¸­å¯¹åå­—ä»¥"A"æˆ–"S"å¼€å§‹çš„æ‰€æœ‰é›‡å‘˜æŒ‰ä»–ä»¬åŸºæœ¬è–ªæ°´çš„10%ç»™ä»–ä»¬åŠ è–ªã€‚
-
---10ã€æŒ‰ç…§salgradeè¡¨ä¸­çš„æ ‡å‡†ï¼Œç»™å‘˜å·¥åŠ è–ªï¼Œ1ï¼š5%ï¼Œ2ï¼š4%ï¼Œ3ï¼š3%ï¼Œ4ï¼š2%ï¼Œ5ï¼š1%ï¼Œ 
---å¹¶æ‰“å°è¾“å‡ºæ¯ä¸ªäººï¼ŒåŠ è–ªå‰åçš„å·¥èµ„ã€‚
-
-
+--9¡¢±àĞ´Ò»¸öPL/SQL³ÌĞò¿é£¬´Óemp±íÖĞ¶ÔÃû×ÖÒÔ"A"»ò"S"¿ªÊ¼µÄËùÓĞ¹ÍÔ±°´ËûÃÇ»ù±¾Ğ½Ë®µÄ10%¸øËûÃÇ¼ÓĞ½¡£
+declare
+cursor cur is select * from emp where instr(ename, 'A') = 1 or instr(ename, 'S') = 1;
+begin
+  for v in cur loop
+    update emp set sal = sal * 1.1 where empno = v.empno;
+    end loop;
+    end;
+    select * from emp;
+  
+--10¡¢°´ÕÕsalgrade±íÖĞµÄ±ê×¼£¬¸øÔ±¹¤¼ÓĞ½£¬1£º5%£¬2£º4%£¬3£º3%£¬4£º2%£¬5£º1%£¬ 
+--²¢´òÓ¡Êä³öÃ¿¸öÈË£¬¼ÓĞ½Ç°ºóµÄ¹¤×Ê¡£
+declare
+cursor cur is select * from emp e, salgrade s where e.sal between s.losal and s.hisal;
+v_emp emp%rowtype;
+begin
+   for v in  cur loop
+     if v.grade = 1 then
+       update emp set sal = sal * 1.05 where empno = v.empno;
+       elsif v.grade = 2 then
+         update emp set sal = sal * 1.04 where empno = v.empno;
+         elsif v.grade = 3 then
+           update emp set sal = sal * 1.03 where empno = v.empno;
+           elsif v.grade = 4 then
+             update emp set sal = sal * 1.02 where empno = v.empno;
+             else
+               update emp set sal = sal * 1.01 where empno = v.empno;
+               end if;
+               select * into v_emp from emp where empno = v.empno;
+               dbms_output.put_line(v.empno || ', before: ' || v.sal || ', after: ' || v_emp.sal);
+               end loop;
+               end;
