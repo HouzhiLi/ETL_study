@@ -36,7 +36,77 @@ utl_file.fclose(v_file) -- 关闭文件
 
 创建目录
 create directory directory_name as 'syspath'; -- 需要oracle用户有读写权限
-create directory directory as 'e:\data\';
+create directory filepath as 'e:\data';
+drop directory directory;
+grant drop any directory to scott;
+
+declare
+f utl_file.file_type;
+begin
+  f := utl_file.fopen('FILEPATH', 'test.txt', 'w');
+  utl_file.put_line(f, 'aaa');
+  utl_file.put_line(f, 'bbb');
+  utl_file.fclose(f);
+  end;
+
+declare
+f utl_file.file_type;
+v varchar2(300);
+begin
+  f := utl_file.fopen('FILEPATH', 'test.txt', 'r');
+  begin
+  loop
+    utl_file.get_line(f, v);
+    dbms_output.put_line(v);
+    end loop;
+    exception 
+      when no_data_found then
+        null;
+        end;
+        utl_file.fclose(f);
+        end;
+ 
+-----------------------------------------------------------------------   
+
+--将dept表中数据写入到csv文件中
+declare
+f utl_file.file_type;
+cursor cur is select deptno || ',' || dname || ',' || loc as s from dept;
+begin
+  f := utl_file.fopen('FILEPATH', 'test.txt', 'w');
+  for v in cur loop
+    utl_file.put_line(f, v.s);
+    end loop;
+  utl_file.fclose(f);
+  end;
+
+--将csv文件导入到备份表中
+create table dept_bak as select * from dept where 1 = 0;
+select * from dept_bak;
+
+declare
+f utl_file.file_type;
+v varchar2(300);
+cursor cur is select * from dept_bak;
+begin
+  f := utl_file.fopen('FILEPATH', 'test.txt', 'r');
+  begin
+  loop
+    utl_file.get_line(f, v);
+    dbms_output.put_line(v);
+    insert into dept_bak values (substr(v, 1, instr(v, ',', 1, 1)-1), substr(v, instr(v, ',', 1, 1)+1, instr(v, ',', 1, 2) - (instr(v, ',', 1, 1)+1)), substr(v, instr(v, ',', 1, 2)+1));
+    end loop;
+    exception 
+      when no_data_found then
+        null;
+        end;
+        utl_file.fclose(f);
+    dbms_output.put_line(rpad('-', 50, '-'));    
+        for v in cur loop
+          dbms_output.put_line(v.deptno|| ', ' || v.dname|| ', ' || v.loc);
+          end loop;
+          rollback;
+        end;
+        
 
 
-    
