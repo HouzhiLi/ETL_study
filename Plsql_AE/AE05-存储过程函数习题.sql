@@ -160,7 +160,8 @@ begin
       end;*/
       -- 垃圾代码
       ---------------------------------
-declare
+create or replace procedure p5 
+is
 cursor cur1 is select c1 from cc group by c1;
 cursor cur2(n number) is select * from cc where c1 = n;
 begin
@@ -172,7 +173,7 @@ begin
       dbms_output.new_line();
       end loop;
       end;
-    
+call p5();
 6.创建一个过程，能向dept表中添加一个新记录.（in参数）
 create or replace procedure p6(d in dept%rowtype)
 is
