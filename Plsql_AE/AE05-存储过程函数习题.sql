@@ -142,13 +142,36 @@ c1 c2
 2 天气
 3 好
 要求：不能改变表结构及数据内容
-create table cc(
+/*create table cc(
 c1 number(2),
 c2 varchar2(20));
 select * from cc for update;
-
 declare
-cursor cur is select * from 
+cursor cur is select cc.*, count(1) over(partition by c1 order by c1 asc) as c from cc;
+v_c2 varchar2(20);
+begin
+  for v in cur loop
+    dbms_output.put(v.c || ' ');
+    for m in (select cc.*, row_number() over(partition by c1 order by c1 asc) rn from cc where c1 = v.c1) loop
+    dbms_output.put(m.c2);
+      end loop;
+      dbms_output.new_line();
+      end loop;
+      end;*/
+      -- 垃圾代码
+      ---------------------------------
+declare
+cursor cur1 is select c1 from cc group by c1;
+cursor cur2(n number) is select * from cc where c1 = n;
+begin
+  for v in cur1 loop
+    dbms_output.put(v.c1 || ' ');
+    for m in cur2(v.c1) loop
+      dbms_output.put(m.c2);
+      end loop;
+      dbms_output.new_line();
+      end loop;
+      end;
     
 6.创建一个过程，能向dept表中添加一个新记录.（in参数）
 create or replace procedure p6(d in dept%rowtype)
