@@ -178,14 +178,55 @@ call p5();
 create or replace procedure p6(d in dept%rowtype)
 is
 begin
-  insert into dept values()
+  insert into dept values(d.deptno, d.dname, d.loc);
+  end;
+  
+  declare
+  d dept%rowtype;
+  begin
   d.deptno := &deptno;
   d.dname := '&dname';
   d.loc := '&loc';
-  end
+  p6(d);
+  
+  rollback;
+  end;
+  
 7.创建一个过程，从emp表中带入雇员的姓名，返回该雇员的薪水值。（out参数）
-8.对所有员工,如果该员工职位是MANAGER，并且在DALLAS工作那么就给他薪金加15％；如果该员工职位是CLERK，并且在NEW YORK工作那么就给他薪金扣除5％;其他情况不作处理
-对所有员工,如果该员工部门是SALES，并且工资少于1500那么就给他薪金加15％；如果该员工部门是RESEARCH，并且职位是CLERK那么就给他薪金增加5％;其他情况不作处理 
+create or replace procedure p7 (v_ename in varchar2, v_sal out number)
+is
+begin
+  select sal into v_sal from (select * from emp where ename = v_ename) where rownum = 1;
+  end;
+  
+  declare
+  v_e varchar2(20):= 'SMITH';
+  v_s number;
+  begin
+    p7(v_e, v_s);
+    dbms_output.put_line(v_s);
+    end;
+    
+8.
+对所有员工,如果该员工职位是MANAGER，并且在DALLAS工作那么就给他薪金加15％；
+如果该员工职位是CLERK，并且在NEW YORK工作那么就给他薪金扣除5％;其他情况不作处理
+对所有员工,如果该员工部门是SALES，并且工资少于1500那么就给他薪金加15％；
+如果该员工部门是RESEARCH，并且职位是CLERK那么就给他薪金增加5％;其他情况不作处理 
+create or replace function (n number)
+is
+cursor cur(eno number) is select e.empno, e.job, e.sal, d.loc  from emp e, dept d where e.deptno = d.deptno and  e.empno = eno;
+begin
+  for v in cur(n) loop
+    if v.job = 'MANAGER' and v.loc = 'DALLAS' then
+      v.sal = v.sal * 1.15;
+      elsif v.job = 'CLERK' and v.loc = 'NEW YORK' then
+        v.sal = v.sal * 0.95;
+        elsif v.dname = 'SALES' and v.sal < 1500 then
+          v.sal = v.sal *1.15;
+          elsif  v.job = 'RESEARCH' and v.job
+    end loop;
+  end;
+
 9.对直接上级是'BLAKE'的所有员工，按照参加工作的时间加薪：
 81年6月以前的加薪10％
 81年6月以后的加薪5％

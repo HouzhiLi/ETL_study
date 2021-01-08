@@ -175,3 +175,136 @@ begin
   select count(*) into n from emp where deptno=n;
   
 end;
+
+2.函数
+函数：是一个有名字的plsql代码块，用来实现数学计算或功能的.它有返回值，在使用时
+必须使用到返回值，参数类型有in,out,in out,可以在sql语句中使用，还可以在plsql代码块中使用
+
+函数的定义语法：
+create [or replace] function 函数名(参数 in|out|in out 数据类型[:=默认值])
+return 返回值类型
+is
+   --声名部分
+begin
+   --代码块
+   return语句;
+   --异常处理
+end;
+
+--创建一个函数，传入矩形的长和宽，计算矩形的面积
+create or replace function fn1(w in number,h number)
+return number
+is
+   --声名一个变量保存矩形的面积
+   s number;
+begin
+   s:=w*h;
+   --返回结果
+   return s;
+end;
+
+函数的调用（必须使用到返回值）：
+（1）在sql中调用
+select fn1(3,4) from dual;
+
+(2)在plsql中调用（必须使用返回值）
+declare
+  --声名一个变量
+  s number;
+begin
+  s:=fn1(3,4);
+  dbms_output.put_line(s);
+end;
+
+begin
+  dbms_output.put_line(fn1(3,4));
+end;
+
+begin
+  if fn1(3,4)>10 then
+    dbms_output.put_line('矩形的面积大于10');
+  end if;
+end;
+
+
+--写一个函数，传入一个员工编号，如果员工的工资小于2000,那么给员工加薪500，函数返回1;
+--  如果员工工资大于等于2000，不给他加薪 函数返回0
+
+--返回1或0
+状态值：
+--1表示给员工加薪了
+--0表示没有加薪
+
+--执行update语句
+create or replace function fn2(eno number)
+return number
+is
+   --声名一个变量保存员工的工资
+   v_sal number;
+begin
+   select sal into v_sal from emp where empno=eno;
+   --判断工资是否小于2000
+   if v_sal<2000 then
+      --如果工资小于2000给他加薪500
+      update emp set sal=sal+500 where empno=eno;
+      return 1;
+   else
+      --工资大于2000,不加薪，返回0
+      return 0;
+   end if;
+end;
+--selec语句中调用的函数不能使用dml操作
+begin
+   if fn2(7566)=1 then
+      dbms_output.put_line('加薪');
+   else
+      dbms_output.put_line('未加薪');
+   end if;
+end;
+
+
+
+select * from emp;
+
+
+--函数的递归调用（自已调用自已）
+--写一个函数，计算一个数的阶乘 
+create or replace function fn3(n number)
+return number
+is
+   --声名一个变量保存阶乘结果
+   s number:=1;
+begin
+   for i in 1..n loop
+     s:=s*i;
+   end loop;
+   return s;
+end;
+select fn3(5) from dual;
+
+create or replace function fn4(n number)
+return number
+is
+begin
+  /***
+    fn4(5) n=5
+     1    n=5     n<=2不成立   n*fn4(n-1)=5*fn4(4)=5*4*fn4(3)=5*4*3*fn4(2)=5*4*3*2
+            fn4(4)   n=4     n<=2不成立  n*fn4(n-1)=4*fn4(3) =4*3*fn4(2)=4*3*2 
+            fn4(3)   n=3     .........   n*fn4(n-1)=3*fn4(2)=3*2
+            fn4(2)   n=2     条件成立   返回 n  2
+     
+  
+  */
+  if n<=2 then
+    --如果n小于等于2时，阶乘等于n本身
+    return n;
+  else
+    return n*fn4(n-1);
+  end if;
+end;
+
+递归调用：必须有一个临界条件，当前条件满足时，返回一个固定的值
+          其次他做的事必须有一个规律
+ 
+
+select fn4(6) from dual;
