@@ -118,15 +118,17 @@ begin
       end loop;
       end;
     call p4();
-    
-   /* for i in (select table_name from user_tables ) loop
+  -- ↑num_rows(oracle定期更新，时效性差)↑  
+  -- ↓拼接sql语句↓
+  begin
+    for i in (select table_name from user_tables ) loop
       for n in (select count(1) from table(i.table_name)) loop
       --dbms_output.put_line(i.table_name);
      --select count(*) into n from i.table_name;
        dbms_output.put_line(i.table_name || rpad('.', 50, '.') || n);
        end loop;
      end loop;
-     end;*/
+     end;
 5.某cc表数据如下：
 c1 c2
 --------------
@@ -142,11 +144,11 @@ c1 c2
 2 天气
 3 好
 要求：不能改变表结构及数据内容
-/*create table cc(
+create table cc(
 c1 number(2),
 c2 varchar2(20));
 select * from cc for update;
-declare
+/*declare
 cursor cur is select cc.*, count(1) over(partition by c1 order by c1 asc) as c from cc;
 v_c2 varchar2(20);
 begin
@@ -173,7 +175,9 @@ begin
       dbms_output.new_line();
       end loop;
       end;
+      
 call p5();
+
 6.创建一个过程，能向dept表中添加一个新记录.（in参数）
 create or replace procedure p6(d in dept%rowtype)
 is
@@ -188,7 +192,6 @@ begin
   d.dname := '&dname';
   d.loc := '&loc';
   p6(d);
-  
   rollback;
   end;
   
@@ -212,24 +215,41 @@ begin
 如果该员工职位是CLERK，并且在NEW YORK工作那么就给他薪金扣除5％;其他情况不作处理
 对所有员工,如果该员工部门是SALES，并且工资少于1500那么就给他薪金加15％；
 如果该员工部门是RESEARCH，并且职位是CLERK那么就给他薪金增加5％;其他情况不作处理 
-create or replace function (n number)
+select * from emp;
+select * from dept;
+create or replace procedure p8
 is
-cursor cur(eno number) is select e.empno, e.job, e.sal, d.loc  from emp e, dept d where e.deptno = d.deptno and  e.empno = eno;
+cursor cur is select e.empno, e.job, e.sal, d.dname, d.loc  from emp e, dept d where e.deptno = d.deptno;
 begin
-  for v in cur(n) loop
+  for v in cur loop
     if v.job = 'MANAGER' and v.loc = 'DALLAS' then
-      v.sal = v.sal * 1.15;
+      v.sal := v.sal * 1.15;
       elsif v.job = 'CLERK' and v.loc = 'NEW YORK' then
-        v.sal = v.sal * 0.95;
+        v.sal := v.sal * 0.95;
         elsif v.dname = 'SALES' and v.sal < 1500 then
-          v.sal = v.sal *1.15;
-          elsif  v.job = 'RESEARCH' and v.job
+          v.sal := v.sal * 1.15;
+          elsif  v.dname = 'RESEARCH' and v.job = 'CLERK'then
+            v.sal := v.sal * 1.05;
+            else
+              null;
+              end if;
+              update emp set sal = v.sal where empno = v.empno;
     end loop;
   end;
+
+begin
+p8;
+for v in (select * from emp) loop
+dbms_output.put_line(v.empno|| ',' || v.sal|| ',' || v.deptno|| ',' || v.job);
+end loop;
+rollback;
+end;
 
 9.对直接上级是'BLAKE'的所有员工，按照参加工作的时间加薪：
 81年6月以前的加薪10％
 81年6月以后的加薪5％
+
+
 10.编写一PL/SQL，对所有的"销售员"(SALESMAN)增加佣金500.
 11.编写一个PL/SQL程序块，对名字以"A"或"S"开始的所有雇员按他们的基本薪水的10%加薪。
 12.编写一PL/SQL，以提升两个资格最老的"职员"为"高级职员"。（工作时间越长，优先级越高）
@@ -245,9 +265,25 @@ begin
   end;
  
 call p13(4);
-    
-14.编写一个给特殊雇员加薪10%的过程，这之后，检查如果已经雇佣该雇员超过60个月，则给他额外加薪3000.
-create or replace procedure p1
+
+14.编写一个给特殊雇员加薪10%的过程，这之后，
+检查如果已经雇佣该雇员超过60个月，则给他额外加薪3000.
+create or replace procedure p14
 is
+o_sal number;
+cursor cur is select * from emp;
 begin
+  for v in cur loop
+    v.sal := v.sal * 1.1;
+    if months_between(sysdate, v.hiredate) > 60 then
+      v.sal := v.sal +3000;
+      end if;
+      select sal into o_sal from emp where empno = v.empno;
+      update emp set sal = v.sal where empno = v.empno;
+      dbms_output.put_line(v.empno|| ', 就职时间: ' || trunc(months_between(sysdate, v.hiredate),1)|| ', 新工资: ' || v.sal|| ', 旧工资: ' || o_sal);
+      end loop;
+      rollback;
+      end; 
+
+call p14();      
   
