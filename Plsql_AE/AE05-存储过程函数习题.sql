@@ -1,11 +1,10 @@
 1.写一个存储过程，输入员工信息，在emp表中插入一条员工信息
-
-create or replace procedure p1(v in emp%rowtype)
+create or replace procedure p01(v in emp%rowtype)
 is
 begin
   insert into emp values (v.empno, v.ename, v.job, v.mgr, v.hiredate, v.sal, v.comm, v.deptno);
   end;
-  
+----------------------------------------------------------------------
 declare
   v emp%rowtype;
   begin
@@ -22,8 +21,7 @@ declare
 
 2.(变态题)写一个存储过程，输入一个字符串，在员工表中插入一条员工信息，字符串格式
 员工编号,姓名,工作,上级编号,入职时间,佣金,部门编号
-
-create or replace procedure p2(v in varchar2) is
+create or replace procedure p02(v in varchar2) is
 /*declare
 v varchar2(300) := '1111,takami,worker,222,19951109,500,50,10';*/
 begin
@@ -56,10 +54,10 @@ declare
 m varchar2(300);
 begin
   m := '1111,takami,worker,222,19951109,500,50,10';
-  p2(m);
+  p02(m);
   end;
 ----------------------------------------
-call p2(&v);  
+call p02(&v);  
 select * from emp;
 
   
@@ -68,12 +66,12 @@ select * from emp;
      如果输入多个值，则修改员工的多个信息
      例如：输入员工的姓名、工作、工资，则要求
      把姓名、工作、工资信息都修改
-     create or replace procedure p3 (v emp%rowtype)
+     create or replace procedure p03 (v emp%rowtype)
      is
      begin
        update emp set ename = nvl(v.ename, ename), job = nvl(v.job, job), sal = nvl(v.sal, sal) where empno = v.empno;
        end;
-       
+------------------------------------------------------------------     
        declare
        v emp%rowtype;
        begin
@@ -85,7 +83,7 @@ select * from emp;
          v.sal := &sal;
          v.comm := &comm;
          v.deptno := &deptno;
-         p3(v);
+         p03(v);
          end;
          select * from emp;
          
@@ -95,40 +93,31 @@ EMP...................................14
 BONUS.................................0
 SALGRADE.............................5
 提示：查找用户下所有表名的sql为select table_name from user_tables;
-
-/*create table ttt as select * from emp where 1=0;
-select * from emp;
-create or replace procedure p4 is
-begin
-  for i in (select ut.table_name tn, count(*) c
-              from user_tables ut, user_tab_cols ut_c
-             where ut.TABLE_NAME(+) = ut_c.TABLE_NAME
-             group by ut.TABLE_NAME) loop
-    -- select table_name tn, count(*) c from user_tables ut, user_tab_cols ut_c where ut.TABLE_NAME(+) = ut_c.TABLE_NAME  group by ut.TABLE_NAME;
-    dbms_output.put_line(i.tn || rpad('.', 50, '.') || i.c);
-  end loop;
-  end; 
-  call p4();*/
-  
-  create or replace procedure p4
+  create or replace procedure p04
   is
   begin
     for i in (select * from user_tables) loop
       dbms_output.put_line(i.table_name || rpad('.', 50, '.') || nvl(i.num_rows,0));
       end loop;
       end;
-    call p4();
+
+call p04();
   -- ↑num_rows(oracle定期更新，时效性差)↑  
+---------------------------------------------------------------------------- 
   -- ↓拼接sql语句↓
+  create or replace procedure p04
+  is
+  v_sql varchar2(300):= 'select count(1) from ';
+  n number;
   begin
-    for i in (select table_name from user_tables ) loop
-      for n in (select count(1) from table(i.table_name)) loop
-      --dbms_output.put_line(i.table_name);
-     --select count(*) into n from i.table_name;
-       dbms_output.put_line(i.table_name || rpad('.', 50, '.') || n);
-       end loop;
+    for v in (select table_name from user_tables ) loop
+      execute immediate concat(v_sql, v.table_name) into n;
+       dbms_output.put_line(v.table_name || rpad('.', 50, '.') || n);
      end loop;
      end;
+------------------------------------------------------   
+call p04();
+     
 5.某cc表数据如下：
 c1 c2
 --------------
@@ -147,22 +136,16 @@ c1 c2
 create table cc(
 c1 number(2),
 c2 varchar2(20));
-select * from cc for update;
-/*declare
-cursor cur is select cc.*, count(1) over(partition by c1 order by c1 asc) as c from cc;
-v_c2 varchar2(20);
-begin
-  for v in cur loop
-    dbms_output.put(v.c || ' ');
-    for m in (select cc.*, row_number() over(partition by c1 order by c1 asc) rn from cc where c1 = v.c1) loop
-    dbms_output.put(m.c2);
-      end loop;
-      dbms_output.new_line();
-      end loop;
-      end;*/
-      -- 垃圾代码
-      ---------------------------------
-create or replace procedure p5 
+insert into cc values (1, '西');
+insert into cc values (1, '安');
+insert into cc values (1, '的');
+insert into cc values (2, '天');
+insert into cc values (2, '气');
+insert into cc values (3, '好');
+commit;
+select * from cc; 
+----------------------------------------------------
+create or replace procedure p05 
 is
 cursor cur1 is select c1 from cc group by c1;
 cursor cur2(n number) is select * from cc where c1 = n;
@@ -175,11 +158,11 @@ begin
       dbms_output.new_line();
       end loop;
       end;
-      
-call p5();
+-----------------------------------------------------     
+call p05();
 
 6.创建一个过程，能向dept表中添加一个新记录.（in参数）
-create or replace procedure p6(d in dept%rowtype)
+create or replace procedure p06(d in dept%rowtype)
 is
 begin
   insert into dept values(d.deptno, d.dname, d.loc);
@@ -191,22 +174,22 @@ begin
   d.deptno := &deptno;
   d.dname := '&dname';
   d.loc := '&loc';
-  p6(d);
+  p06(d);
   rollback;
   end;
   
 7.创建一个过程，从emp表中带入雇员的姓名，返回该雇员的薪水值。（out参数）
-create or replace procedure p7 (v_ename in varchar2, v_sal out number)
+create or replace procedure p07 (v_ename in varchar2, v_sal out number)
 is
 begin
   select sal into v_sal from (select * from emp where ename = v_ename) where rownum = 1;
   end;
-  
+---------------------------------------------------------------------------------------------- 
   declare
   v_e varchar2(20):= 'SMITH';
   v_s number;
   begin
-    p7(v_e, v_s);
+    p07(v_e, v_s);
     dbms_output.put_line(v_s);
     end;
     
@@ -217,7 +200,8 @@ begin
 如果该员工部门是RESEARCH，并且职位是CLERK那么就给他薪金增加5％;其他情况不作处理 
 select * from emp;
 select * from dept;
-create or replace procedure p8
+---------------------------------------------------
+create or replace procedure p08
 is
 cursor cur is select e.empno, e.job, e.sal, d.dname, d.loc  from emp e, dept d where e.deptno = d.deptno;
 begin
@@ -236,9 +220,9 @@ begin
               update emp set sal = v.sal where empno = v.empno;
     end loop;
   end;
-
+------------------------------------------------------------------------------
 begin
-p8;
+p08;
 for v in (select * from emp) loop
 dbms_output.put_line(v.empno|| ',' || v.sal|| ',' || v.deptno|| ',' || v.job);
 end loop;
@@ -248,22 +232,118 @@ end;
 9.对直接上级是'BLAKE'的所有员工，按照参加工作的时间加薪：
 81年6月以前的加薪10％
 81年6月以后的加薪5％
-
-
+create or replace procedure p09(mgn in varchar2)
+is
+cursor cur(ena emp.ename%type) is select e1.empno as empno, e1.sal as sal, e1.hiredate as hiredate, e2.ename as mgrname from emp e1, emp e2 where e1.mgr = e2.empno and e2.ename = /*'BLAKE'*/ena;
+begin
+  for v in cur(mgn) loop
+    if v.hiredate < to_date('19810601', 'yyyymmdd') then
+      v.sal := v.sal * 1.1;
+      else
+        v.sal := v.sal * 1.05;
+        end if;
+        update emp set sal = v.sal where empno = v.empno;
+        end loop;
+  end;
+-------------------------------------------------------------------------------
+declare
+v_mgn varchar2(10):= 'BLAKE';
+cursor cur(ena emp.ename%type) is select e1.empno as empno, e1.sal as sal, e1.hiredate as hiredate, e2.ename as mgrname from emp e1, emp e2 where e1.mgr = e2.empno and e2.ename = /*'BLAKE'*/ena;
+begin
+  for v in cur(v_mgn) loop
+    dbms_output.put_line(v.empno || ', ' || v.mgrname || ', ' || v.sal);
+    end loop;
+  p09(v_mgn);
+    dbms_output.put_line(rpad('-', 50, '-'));
+  for v in cur(v_mgn) loop
+    dbms_output.put_line(v.empno || ', ' || v.mgrname || ', ' || v.hiredate || ', ' || v.sal);
+    end loop;
+    rollback;
+    end;
+    
 10.编写一PL/SQL，对所有的"销售员"(SALESMAN)增加佣金500.
+create or replace procedure p10(v_job in varchar2)
+is
+/*declare
+v_job varchar2(30) := 'SALESMAN';*/
+v_sql varchar2(300):= 'update emp set comm = nvl(comm,0) + 500 where job = :1';-- cursor cur(v_job emp.job%type) is select * from emp;
+begin
+  execute immediate v_sql using v_job;
+  end;
+----------------------------------------------------------------------------------  
+declare
+v_job varchar2(30):= 'SALESMAN';
+begin
+  for v in (select * from emp where job = v_job) loop
+    dbms_output.put_line(v.empno || ', ' || v.job || ', ' || v.comm);
+    end loop;
+  p10(v_job);
+  dbms_output.put_line(rpad('-', 50, '-'));
+  for v in (select * from emp where job = v_job) loop
+    dbms_output.put_line(v.empno || ', ' || v.job || ', ' || v.comm);
+    end loop;
+    rollback;
+    end; 
+  
 11.编写一个PL/SQL程序块，对名字以"A"或"S"开始的所有雇员按他们的基本薪水的10%加薪。
+create or replace procedure p11(n in varchar2)
+is
+v_sql varchar2(300) := 'update emp set sal = sal * 1.1 where instr(ename, :1) = 1';
+begin
+  execute immediate v_sql using n;
+  end;
+ -------------------------------------------------------------------------- 
+begin
+  for v in (select * from emp where ename like 'A%' or ename like 'S%') loop
+    dbms_output.put_line(v.ename || ', ' || v.sal);
+    end loop;
+    p11('A');
+    p11('S');
+    dbms_output.put_line(rpad('-', 50, '-'));
+  for v in (select * from emp where ename like 'A%' or ename like 'S%') loop
+    dbms_output.put_line(v.ename || ', ' || v.sal);
+    end loop;
+    rollback;
+    end;  
+  
 12.编写一PL/SQL，以提升两个资格最老的"职员"为"高级职员"。（工作时间越长，优先级越高）
-
+alter table emp modify job varchar2(30);
+------------------------------------------------------------------
+create or replace procedure p12
+is
+v emp%rowtype;
+cursor cur is select * from emp where job = 'CLERK' order by hiredate asc;
+begin
+  open cur;
+  loop
+    fetch cur into v;
+    update emp set job = 'SENIOR_CLERK' where empno = v.empno;
+    exit when cur%rowcount = 2;
+    end loop;
+    close cur;
+  end;
+-------------------------------------------------------------
+begin 
+  for v in (select * from emp where job = 'CLERK') loop
+    dbms_output.put_line(v.empno || ', ' || v.ename || ', ' || v.job || ', ' || v.hiredate);
+    end loop;
+    p12;
+    dbms_output.put_line(rpad('-', 50, '-'));
+  for v in (select * from emp where job in ('CLERK', 'SENIOR_CLERK')) loop
+    dbms_output.put_line(v.empno || ', ' || v.ename || ', ' || v.job || ', ' || v.hiredate);
+    end loop;
+    rollback;
+    end;
+    
 13.显示EMP中的第四条记录。
 create or replace procedure p13(n in number)
 is 
 v emp%rowtype;
---v_sql varchar2(300) := 'select * from (select emp.*, rownum rn from emp) t where t.rn = n'; 
 begin
   select empno, ename, job, mgr, hiredate, sal, comm, deptno into v from (select emp.*, rownum rn from emp) t where t.rn = n;
   dbms_output.put_line(v.empno|| ', ' || v.ename|| ', ' || v.job|| ', ' || v.mgr|| ', ' || v.hiredate|| ', ' || v.sal|| ', ' || v.comm|| ', ' || v.deptno);
   end;
- 
+------------------------------------------------------------------------------------
 call p13(4);
 
 14.编写一个给特殊雇员加薪10%的过程，这之后，
@@ -284,6 +364,7 @@ begin
       end loop;
       rollback;
       end; 
-
+---------------------------------------------------------------
 call p14();      
-  
+
+
