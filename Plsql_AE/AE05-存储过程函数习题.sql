@@ -1,3 +1,11 @@
+
+  drop procedure p2;
+    drop procedure p3;
+      drop procedure p4;
+        drop procedure p5;
+          drop procedure p6;
+            drop procedure p7;
+
 1.写一个存储过程，输入员工信息，在emp表中插入一条员工信息
 create or replace procedure p01(v in emp%rowtype)
 is
@@ -57,7 +65,7 @@ begin
   p02(m);
   end;
 ----------------------------------------
-call p02(&v);  
+call p02('&v');  
 select * from emp;
 
   
@@ -346,6 +354,24 @@ begin
 ------------------------------------------------------------------------------------
 call p13(4);
 
+---------------------------------------
+
+create or replace procedure p13(n in number)
+is
+cursor cur is select * from emp;
+v emp%rowtype;
+begin
+  open cur;
+  loop
+    fetch cur into v;
+    null;
+    exit when cur%rowcount = 4;
+    end loop;
+  dbms_output.put_line(v.empno|| ', ' || v.ename|| ', ' || v.job|| ', ' || v.mgr|| ', ' || v.hiredate|| ', ' || v.sal|| ', ' || v.comm|| ', ' || v.deptno);
+  close cur;
+  end;
+-------------------------------------- 
+  call p13(4);
 14.编写一个给特殊雇员加薪10%的过程，这之后，
 检查如果已经雇佣该雇员超过60个月，则给他额外加薪3000.
 create or replace procedure p14
