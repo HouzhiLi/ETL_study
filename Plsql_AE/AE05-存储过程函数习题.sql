@@ -57,6 +57,8 @@ begin
      substr(v,
             instr(v, ',', 1, 7) + 1));
 end;
+
+select instr('aa,bb,cc', ',', -1, 1) from dual;
 ----------------------------------------
 declare
 m varchar2(300);
@@ -67,8 +69,156 @@ begin
 ----------------------------------------
 call p02('&v');  
 select * from emp;
+----------------------------------------
+--declare
+--v varchar2(300) := '1111,takami,worker,222,19951109,500,50,10';
+create or replace procedure p02(v varchar2)
+is
+n number;
+tmp varchar2(20);
+v_sql varchar2(300); 
+vc varchar2(300) := '';
+type ttype is table of varchar2(30);
+t ttype;
+begin
+  n := (length(v) - length(replace(v, ',', '')) + 1);
+  select data_type bulk collect into t from user_tab_cols where table_name = 'EMP';
+  for i in 1..n loop
+    if t(i) = 'DATE' then
+      tmp := substr(v, instr(v, ',', 1, i-1)+1, instr(v, ',', 1, i) - instr(v, ',', 1, i-1) - 1);
+          --dbms_output.put_line(tmp);
+          vc := vc || 'to_date(''' || tmp || ''', ''yyyymmdd'')' || ',';
+          else
+    if i = 1 then
+      tmp := substr(v, 1, instr(v, ',', 1, 1)-1);
+      --dbms_output.put_line(tmp);
+      vc := vc || '''' || tmp || '''' || ',';
+      elsif i = n then
+        tmp := substr(v, instr(v, ',', 1, i-1)+1);
+        --dbms_output.put_line(tmp);
+        vc := vc || tmp;   
+        else
+          tmp := substr(v, instr(v, ',', 1, i-1)+1, instr(v, ',', 1, i) - instr(v, ',', 1, i-1) - 1);
+          --dbms_output.put_line(tmp);
+          vc := vc || '''' || tmp || '''' || ',';
+          end if;   
+          end if;
+    end loop;
+    v_sql := 'insert into emp values('||vc||')';
+    --dbms_output.put_line(vc);
+    --dbms_output.put_line(v_sql);
+    execute immediate v_sql;
+    for m in (select * from emp) loop
+    dbms_output.put_line(m.empno || ',' || m.ename);
+    end loop;
+    rollback;
+    end;
+    
+declare
+v varchar2(300) := '1111,takami,worker,222,19951109,500,50,10';
+begin
+  p02(v);
+  end;
+--截取字符串(正则表达式)
 
+--select regexp_substr('1111,takami,worker,222,19951109,500,50,10', '[^,]+', 1, 1) from dual;
+create or replace procedure p02(v varchar2)
+is
+--declare
+--v varchar2(300) := '1111,takami,worker,222,19951109,500,50,10';
+n number;
+tmp varchar2(20);
+v_sql varchar2(300); 
+vc varchar2(300) := '';
+type ttype is table of varchar2(30);
+t ttype;
+begin
+  n := (length(v) - length(replace(v, ',', '')) + 1);
+  select data_type bulk collect into t from user_tab_cols where table_name = 'EMP';
+  for i in 1..n loop
+    if t(i) = 'DATE' then
+      tmp := regexp_substr(v, '[^,]+', 1, i);
+      --substr(v, instr(v, ',', 1, i-1)+1, instr(v, ',', 1, i) - instr(v, ',', 1, i-1) - 1);
+          --dbms_output.put_line(tmp);
+          vc := vc || 'to_date(''' || tmp || ''', ''yyyymmdd'')' || ',';
+          else
+   /* if i = 1 then
+      tmp := regexp_substr(v, [^,]+, 1, i);
+      --substr(v, 1, instr(v, ',', 1, 1)-1);
+      dbms_output.put_line(tmp);
+      vc := vc || '''' || tmp || '''' || ',';*/
+      if i = n then
+        tmp := regexp_substr(v, '[^,]+', 1, i);
+        --substr(v, instr(v, ',', 1, i-1)+1);
+        --dbms_output.put_line(tmp);
+        vc := vc || tmp;   
+        else
+          tmp := regexp_substr(v, '[^,]+', 1, i);
+          --substr(v, instr(v, ',', 1, i-1)+1, instr(v, ',', 1, i) - instr(v, ',', 1, i-1) - 1);
+          --dbms_output.put_line(tmp);
+          vc := vc || '''' || tmp || '''' || ',';
+          end if;   
+          end if;
+    end loop;
+    v_sql := 'insert into emp values('||vc||')';
+    --dbms_output.put_line(vc);
+    --dbms_output.put_line(v_sql);
+    execute immediate v_sql;
+    /*for m in (select * from emp) loop
+    dbms_output.put_line(m.empno || ',' || m.ename);
+    end loop;*/
+    --rollback;
+    end;
+
+declare
+v varchar2(300) := '1111,takami,worker,222,19951109,500,50,10';
+begin
+  p02(v);
+  end;
+--创建路径
+grant create any directory to scott;  
+create or replace directory d01 as 'E:\data';
+--文件写入
+declare
+n number := 1111;
+v varchar2 (300) := ',takami,worker,222,19951109,500,50,10';
+vc varchar2(300);
+f utl_file.file_type;
+begin
+  f := utl_file.fopen('D01', 'test.txt', 'w');
+  /*v := to_char(n) || v;
+  dbms_output.put_line(v);
+  utl_file.put_line(f,v);*/
+  for i in 1..8 loop
+    vc := to_char(n) || v;
+    n := n + 1111;
+    utl_file.put_line(f,vc);
+    end loop;
+  utl_file.fclose(f);
+  end;
+--文件导出  
+declare
+f utl_file.file_type;
+v varchar2(300);
+begin
+  f := utl_file.fopen('D01', 'test.txt', 'r');
+  begin
+  loop
+    utl_file.get_line(f, v);
+    p02(v);
+    end loop;
+    exception 
+      when no_data_found then
+        null;
+        end;
+  utl_file.fclose(f);
   
+  for i in (select * from emp) loop
+  dbms_output.put_line(i.empno);
+  end loop;
+  rollback;
+  end;
+
 3.写一个存储过程，根据输入的参数,修改员工信息，
  注：如果只输入员工姓名，那么就只修改姓名
      如果输入多个值，则修改员工的多个信息
