@@ -46,6 +46,41 @@ begin
 若部门不存在，则返回‘输入的部门不正确，请重新输入’，
 若部门存在，员工不存在，则返回‘部门内不存在该员工’（10分）
 --------------------------------------------------
+--------代码实现（游标循环）↓----------
+--------------------------------------------------
+declare
+dno number := 20;
+eno number := 7369;
+cursor cur1 is select * from dept where deptno = dno;
+cursor cur2 is select * from emp where deptno = dno and empno = eno;
+v dept%rowtype;
+n emp%rowtype;
+begin
+  open cur1;
+  loop
+    fetch cur1 into v;
+     if cur1%notfound then
+       dbms_output.put_line('输入的部门不正确，请重新输入');
+       exit;
+     else
+       open cur2;
+       loop
+         fetch cur2 into n;
+         if cur2%notfound then
+         dbms_output.put_line('部门内不存在该员工');
+         exit;
+         else
+           dbms_output.put_line(n.empno|| ', ' || n.ename|| ', ' || n.job|| ', ' || n.mgr|| ', ' || n.hiredate|| ', ' || n.sal|| ', ' || n.comm|| ', ' || n.deptno);
+           exit;
+         end if;
+       end loop;
+       close cur2;
+       exit;
+     end if;
+  end loop;
+  close cur1;
+end;
+--------------------------------------------------
 ---------代码实现（匿名块）↓------------
 --------------------------------------------------
 declare
