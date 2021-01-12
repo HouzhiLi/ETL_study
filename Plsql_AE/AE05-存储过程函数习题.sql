@@ -12,7 +12,7 @@ is
 begin
   insert into emp values (v.empno, v.ename, v.job, v.mgr, v.hiredate, v.sal, v.comm, v.deptno);
   end;
-----------------------------------------------------------------------
+---------------------------------------------------
 declare
   v emp%rowtype;
   begin
@@ -59,17 +59,17 @@ begin
 end;
 
 select instr('aa,bb,cc', ',', -1, 1) from dual;
-----------------------------------------
+---------------------------------------------------
 declare
 m varchar2(300);
 begin
   m := '1111,takami,worker,222,19951109,500,50,10';
   p02(m);
   end;
-----------------------------------------
+---------------------------------------------------
 call p02('&v');  
 select * from emp;
-----------------------------------------
+---------------------------------------------------
 --declare
 --v varchar2(300) := '1111,takami,worker,222,19951109,500,50,10';
 create or replace procedure p02(v varchar2)
@@ -229,7 +229,7 @@ begin
      begin
        update emp set ename = nvl(v.ename, ename), job = nvl(v.job, job), sal = nvl(v.sal, sal) where empno = v.empno;
        end;
-------------------------------------------------------------------     
+---------------------------------------------------  
        declare
        v emp%rowtype;
        begin
@@ -261,7 +261,7 @@ SALGRADE.............................5
 
 call p04();
   -- ↑num_rows(oracle定期更新，时效性差)↑  
----------------------------------------------------------------------------- 
+---------------------------------------------------
   -- ↓拼接sql语句↓
   create or replace procedure p04
   is
@@ -303,6 +303,23 @@ insert into cc values (3, '好');
 commit;
 select * from cc; 
 ----------------------------------------------------
+select c1, listagg(c2, ' ') within group(order by rowid) from cc group by c1;
+----------------------------------------------------
+--查询出组号
+declare
+s varchar2(100);
+begin
+for v1 in (select distinct c1 from cc order by c1) loop
+  --初始化变量s
+  s := '';
+--根据组号进行拼接
+for v2 in (select c2 from cc where c1 = v1.c1 order by rowid) loop
+  s := s || v2.c2;
+  end loop;
+  dbms_output.put_line(v1.c1 || ' ' || s);
+  end loop;
+  end;
+----------------------------------------------------
 create or replace procedure p05 
 is
 cursor cur1 is select c1 from cc group by c1;
@@ -342,7 +359,54 @@ is
 begin
   select sal into v_sal from (select * from emp where ename = v_ename) where rownum = 1;
   end;
----------------------------------------------------------------------------------------------- 
+-----------------------------------------------------
+create or replace function f07 (v_ename in varchar2)
+return number
+is
+v_sal number;
+begin
+  select sal into v_sal from (select * from emp where ename = v_ename) where rownum = 1;
+  return v_sal;
+  end;
+-----------------------------------------------------
+create or replace procedure p07 (v_ename in varchar2, cur out sys_refcursor)
+is
+begin
+  open cur for select sal from emp where ename = v_ename;
+  end;
+-- 通过游标返回集合类数据  
+declare
+c sys_refcursor;
+s number(6);
+begin
+  p07('SMITH', c);
+  --遍历游标
+  loop
+    fetch c into s;
+    exit when c%notfound;
+    dbms_output.put_line(s);
+    end loop;
+  --关闭游标  
+  close c;
+  end;
+---------------------------------------------------
+create or replace type ttype is table of number(6);
+
+create or replace procedure p07 (v_ename in varchar2, sals out ttype)
+is
+begin
+  select sal bulk collect into sals from emp where ename = v_ename;
+  end;
+  
+declare
+sals ttype;
+begin
+  p07('KING', sals);
+  for v in sals.first..sals.last loop
+    dbms_output.put_line(sals(v));
+    end loop;
+    end;  
+-----------------------------------------------------
   declare
   v_e varchar2(20):= 'SMITH';
   v_s number;
@@ -378,7 +442,7 @@ begin
               update emp set sal = v.sal where empno = v.empno;
     end loop;
   end;
-------------------------------------------------------------------------------
+---------------------------------------------------
 begin
 p08;
 for v in (select * from emp) loop
@@ -403,7 +467,7 @@ begin
         update emp set sal = v.sal where empno = v.empno;
         end loop;
   end;
--------------------------------------------------------------------------------
+---------------------------------------------------
 declare
 v_mgn varchar2(10):= 'BLAKE';
 cursor cur(ena emp.ename%type) is select e1.empno as empno, e1.sal as sal, e1.hiredate as hiredate, e2.ename as mgrname from emp e1, emp e2 where e1.mgr = e2.empno and e2.ename = /*'BLAKE'*/ena;
@@ -418,7 +482,15 @@ begin
     end loop;
     rollback;
     end;
-    
+---------------------------------------------------
+--层次查询
+select * from 表名 connect by prior 层次关系 start with 开始条件;
+select * from emp connect by prior empno = mgr start with mgr is null;
+select emp.*, level from emp connect by prior empno = mgr start with mgr is null order by level asc;
+select emp.*, level from emp connect by prior mgr = empno start with mgr is null order by level asc;
+select * from (select emp.*, level lv from emp connect by prior empno = mgr start with ename = 'BLAKE') where lv = 2;
+--自联关系
+---------------------------------------------------    
 10.编写一PL/SQL，对所有的"销售员"(SALESMAN)增加佣金500.
 create or replace procedure p10(v_job in varchar2)
 is
@@ -428,7 +500,15 @@ v_sql varchar2(300):= 'update emp set comm = nvl(comm,0) + 500 where job = :1';-
 begin
   execute immediate v_sql using v_job;
   end;
-----------------------------------------------------------------------------------  
+--------------------------------------------------- 
+cur for update
+update current cur
+--------------------------------------------------- 
+collect bulk into
+forall i in c.first..c.last
+update
+end; 
+--------------------------------------------------- 
 declare
 v_job varchar2(30):= 'SALESMAN';
 begin
@@ -450,7 +530,7 @@ v_sql varchar2(300) := 'update emp set sal = sal * 1.1 where instr(ename, :1) = 
 begin
   execute immediate v_sql using n;
   end;
- -------------------------------------------------------------------------- 
+---------------------------------------------------
 begin
   for v in (select * from emp where ename like 'A%' or ename like 'S%') loop
     dbms_output.put_line(v.ename || ', ' || v.sal);
@@ -466,7 +546,7 @@ begin
   
 12.编写一PL/SQL，以提升两个资格最老的"职员"为"高级职员"。（工作时间越长，优先级越高）
 alter table emp modify job varchar2(30);
-------------------------------------------------------------------
+---------------------------------------------------
 create or replace procedure p12
 is
 v emp%rowtype;
@@ -480,7 +560,7 @@ begin
     end loop;
     close cur;
   end;
--------------------------------------------------------------
+---------------------------------------------------
 begin 
   for v in (select * from emp where job = 'CLERK') loop
     dbms_output.put_line(v.empno || ', ' || v.ename || ', ' || v.job || ', ' || v.hiredate);
@@ -501,10 +581,10 @@ begin
   select empno, ename, job, mgr, hiredate, sal, comm, deptno into v from (select emp.*, rownum rn from emp) t where t.rn = n;
   dbms_output.put_line(v.empno|| ', ' || v.ename|| ', ' || v.job|| ', ' || v.mgr|| ', ' || v.hiredate|| ', ' || v.sal|| ', ' || v.comm|| ', ' || v.deptno);
   end;
-------------------------------------------------------------------------------------
+---------------------------------------------------
 call p13(4);
 
----------------------------------------
+---------------------------------------------------
 
 create or replace procedure p13(n in number)
 is
@@ -520,9 +600,13 @@ begin
   dbms_output.put_line(v.empno|| ', ' || v.ename|| ', ' || v.job|| ', ' || v.mgr|| ', ' || v.hiredate|| ', ' || v.sal|| ', ' || v.comm|| ', ' || v.deptno);
   close cur;
   end;
--------------------------------------- 
+---------------------------------------------------
   call p13(4);
-14.编写一个给特殊雇员加薪10%的过程，这之后，
+---------------------------------------------------
+--差集运算
+select * from emp where rownum <=4 minus select * from emp where rownum <=3;
+---------------------------------------------------  
+14.编写一个给特殊雇员(empno)加薪10%的过程，这之后，
 检查如果已经雇佣该雇员超过60个月，则给他额外加薪3000.
 create or replace procedure p14
 is
@@ -540,7 +624,9 @@ begin
       end loop;
       rollback;
       end; 
----------------------------------------------------------------
+---------------------------------------------------
 call p14();      
+---------------------------------------------------
 
+---------------------------------------------------
 
