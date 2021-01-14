@@ -524,8 +524,24 @@ insert into dept(deptno) values(50);
    4.接受一个部门编号和薪资，返回该部门高于输入的薪资的员工人数
    
 --------------------------------------------------
+create or replace package pkas99_08
+is     
+       e emp%rowtype;
+       
+       procedure p_output_einfo
+         is
+         begin
+           for v in emp loop
+             dbms_output.put_line()
+           end loop;
+         end;
 
+end pkas99_08;
 
+create or replace package body pkas99_08
+is
+
+end pkas99_08;
 
  
     
