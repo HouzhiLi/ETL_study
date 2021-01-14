@@ -534,27 +534,27 @@ is
        procedure p_e_csal(eno number, v_sal number);
        function f_e_mem(dno number) return number;
        procedure p_e_dinfo(dno number, c out ctype);
-       
-end pk01; 
+
+end pk01;
 
 create or replace package body pk01
 is
-       type ctype is table of emp%rowtype;
-       function f_e_info(eno number) 
+       function f_e_info(eno number)
        return emp%rowtype
        is
        e emp%rowtype;
        begin
          select * into e from emp where empno = eno;
+         return e;
        end;
-       
+
         procedure p_e_csal(eno number, v_sal number)
         is
         begin
-          update from emp set sal = v_sal where empno = eno;
+          update emp set sal = v_sal where empno = eno;
         end;
-        
-        function f_e_mem(dno number) 
+
+        function f_e_mem(dno number)
         return number
         is
         n number;
@@ -562,12 +562,11 @@ is
           select count(1) into n from emp where deptno = dno;
           return n;
         end;
-        
+
         procedure p_e_dinfo(dno number, c out ctype)
         is
-        c ctype;
         begin
           select * bulk collect into c from emp where deptno = dno;
         end;
-       
-end pk01; 
+
+end pk01;

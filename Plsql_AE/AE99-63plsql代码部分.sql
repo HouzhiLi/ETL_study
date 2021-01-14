@@ -526,22 +526,69 @@ insert into dept(deptno) values(50);
 --------------------------------------------------
 create or replace package pkas99_08
 is     
-       e emp%rowtype;
-       
-       procedure p_output_einfo
-         is
-         begin
-           for v in emp loop
-             dbms_output.put_line()
-           end loop;
-         end;
+       n number;
+       type rtype is record (dno number, dname varchar2(20),c1 number,c2 number);
+       procedure p_output_einfo;
+       procedure p_search_m_e;
+       function f_d_e_info return sys_refcursor;
+       function f_d_sal_over(in_dno number, in_sal number) return number;
 
 end pkas99_08;
 
 create or replace package body pkas99_08
-is
+is     
 
+       procedure p_output_einfo
+         is
+         begin
+           for v in (select * from emp) loop
+             dbms_output.put_line(v.empno|| ', ' || v.ename|| ', ' || v.job|| ', ' || v.mgr|| ', ' || v.hiredate|| ', ' || v.sal|| ', ' || v.comm|| ', ' || v.deptno);
+           end loop;
+         end;
+         
+         procedure p_search_m_e
+           is
+           begin
+             for v in (select e1.ename, e1.empno, count(e2.empno) c from emp/*(select * from emp where job in ('MANAGER', 'PRESIDENT'))*/ e1 left join emp e2 on e1.empno = e2.mgr group by e1.empno, e1.ename) loop
+               dbms_output.put_line('empno: ' || v.empno || ', name: ' || v.ename || ', members: ' || v.c);
+             end loop;
+           end;
+           
+           function f_d_e_info 
+             return sys_refcursor
+             is
+             cur sys_refcursor;
+             begin
+               open cur for select d.deptno, d.dname, c1, c1-c2 c2 from dept d join (select deptno, count(1) c1 from emp group by deptno) t1 on d.deptno = t1.deptno join (select deptno, count(1) c2 from emp where sal < 5000 group by deptno) t2 on d.deptno = t2.deptno;
+               return cur;           
+             end;
+           
+           function f_d_sal_over(in_dno number, in_sal number) 
+             return number  
+             is
+             begin
+               select count(1) into n from emp where deptno = in_dno and sal > in_sal;
+               return n;
+             end;
 end pkas99_08;
 
- 
+call pkas99_08.p_output_einfo();
+call pkas99_08.p_search_m_e();
+
+declare
+r pkas99_08.rtype;
+c sys_refcursor;
+begin
+  c := pkas99_08.f_d_e_info;
+  fetch c into r;
+  while c%found loop
+  dbms_output.put_line('' || r.dno|| ', ' || r.dname|| ', ' || r.c1|| ', ' || r.c2);
+  fetch c into r;
+  end loop;
+  close c;
+end; 
+
+begin 
+  dbms_output.put_line(pkas99_08.f_d_sal_over(10, 2000));
+  end;
     
