@@ -325,7 +325,7 @@ end;
 ----------------´úÂë²âÊÔ¡ı--------------------
 --------------------------------------------------
 update sc set sno = 5 where sno = 4 and cno = 2;
-update sc set sno = 4 where sno = 1;
+update sc set sno = 4 where sno = 1 and cno = 2;
 --------------------------------------------------
 begin
 for v in (select * from stu) loop
