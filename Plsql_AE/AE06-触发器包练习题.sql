@@ -165,7 +165,7 @@ select 1,count(*) from sc where sno=1;
 --------------------------------------------------
 ----------------代码实现↓--------------------
 --------------------------------------------------   
-create or replace trigger t01
+/*create or replace trigger t01
 before insert on sc for each row
 declare
 n number;
@@ -178,6 +178,20 @@ begin
       else
         update sc_number set nu = nu+1, score = (score*nu + :new.score)/(nu+1) where sno = :new.sno;
       end case;
+end;*/
+--------------------------------------------------
+----------------代码实现↓--------------------
+-------------------------------------------------- 
+create or replace trigger tae06_01_01
+before insert on stu for each row
+begin
+  insert into sc_number values (:new.sno, 0, 0);
+end;
+
+create or replace trigger tae06_01_02
+before insert on sc for each row
+begin
+  update sc_number set nu = nu+1, score = (score * nu + :new.score)/(nu+1) where sno = :new.sno;
 end;
 --------------------------------------------------
 ----------------代码测试↓--------------------
@@ -229,19 +243,19 @@ end;
 --------------------------------------------------
 ----------------代码实现↓--------------------
 --------------------------------------------------  
-create or replace trigger t02
+create or replace trigger tae06_02
 before delete on sc for each row
 declare
 n number;
 begin
-  dbms_output.put_line(:old.sno);
-  update sc_number set nu = nu-1 where sno = :old.sno returning nu into n;
-  if n = 0 then
-      delete from sc_number where sno = :old.sno;
-      end if;
+  select nu into n from sc_number where sno = :old.sno;
+  case n
+    when 1 then
+      update sc_number set nu = 0 , score = 0 where sno = :old.sno;
+    else  
+      update sc_number set nu = nu-1, score = (score*nu - :old.score)/(nu-1) where sno = :old.sno;
+    end case;   
 end;
-
-delete from sc;
 --------------------------------------------------
 ----------------代码测试↓--------------------
 --------------------------------------------------

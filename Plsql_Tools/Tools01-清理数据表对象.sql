@@ -5,5 +5,3 @@ begin
     dbms_output.put_line('drop table ' || v.table_name || ';');
     end loop;
     end;
-    
-
