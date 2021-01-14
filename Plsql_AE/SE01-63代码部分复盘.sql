@@ -227,6 +227,7 @@ end pk08;
 create or replace package body pk08
 is
        procedure p_output_einfo
+         is
          begin
            for v in (select * from emp) loop
              dbms_output.put_line(v.empno || ', ' || v.ename || ', ' || v.job || ', ' || v.mgr || ', ' || v.hiredate || ', ' || v.sal || ', ' || v.comm || ', ' || v.deptno);             
@@ -236,9 +237,45 @@ is
          procedure p_m_e_relation
            is
            begin
-             for v in (select e1.empno, e1.ename, count(e2.empno) c from emp e1 left join emp e2 on e1.empno = e2.mgr group by e1.empno , e1.ename)
+             for v in (select e1.empno, e1.ename, count(e2.empno) c from emp e1 left join emp e2 on e1.empno = e2.mgr group by e1.empno , e1.ename) loop
+               dbms_output.put_line('员工编号：' ||v.empno || ', 员工姓名：' || v.ename || ', 下属人数：' || v.c);
+             end loop;
            end;
-       
+           
+           function f_d_c 
+             return sys_refcursor
+             is
+             cur sys_refcursor;
+             begin
+               open cur for select d.deptno dno, dname, sum(nvl(s1, 0)) d_num, sum(nvl(s2, 0)) hs_num from dept d left join (select deptno, 1 s1, case when sal >= 5000 then 1 else 0 end s2 from emp) e on e.deptno = d.deptno group by d.deptno, dname;
+               return cur;
+             end;
+             
+           function f_d_s(dno number, vsal number)
+             return number
+             is
+             n number;
+             begin
+               select count(empno) c into n from dept d left join emp e on d.deptno = e.deptno where d.deptno = dno and e.sal > vsal;
+               return n;
+             end; 
 end pk08;
+
+call pk08.p_output_einfo();
+call pk08.p_m_e_relation();
+declare
+v pk08.rtype;
+cur sys_refcursor;
+begin
+  cur := pk08.f_d_c;
+  --for v in cur loop
+  fetch cur into v;
+  while cur%found loop
+    dbms_output.put_line(v.dno || ',' || v.dname ||',' ||v.d_num || ',' || v.hs_num);
+    fetch cur into v;
+    end loop;
+    close cur;
+    end;
+
 --------------------------------------------------   
 --------------------------------------------------
