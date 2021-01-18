@@ -1,0 +1,162 @@
+1.ls命令
+ls命令list的缩写 表示查看目录下的文件内容
+ls  #表示查看当前目录下的文件
+ls -l #查看当前目录下文件的详细信息
+ll  #同ls -l 但这个命令不是通用的
+
+ls [选项 配置项] 目录路径  #表示查看目录下的文件内容
+ls -a  #表示查看目录下的文件包含隐藏文件
+ls -al  #查看当前目录下所有文件的详细信息
+ls -lh  #查看文件的详细信息,h是将文件大小以合适的单位显示
+[root@base ~]# ls
+anaconda-ks.cfg
+[root@base ~]# ls -l
+总用量 4
+-rw-------. 1 root root 1224 1月  15 14:11 anaconda-ks.cfg
+[root@base ~]# ll
+总用量 4
+-rw-------. 1 root root 1224 1月  15 14:11 anaconda-ks.cfg
+[root@base ~]# ls -a
+.  ..  anaconda-ks.cfg  .bash_logout  .bash_profile  .bashrc  .cshrc  .tcshrc
+[root@base ~]# ls -al
+总用量 24
+dr-xr-x---.  2 root root  114 1月  15 14:11 .
+dr-xr-xr-x. 17 root root  224 1月  15 14:10 ..
+-rw-------.  1 root root 1224 1月  15 14:11 anaconda-ks.cfg
+-rw-r--r--.  1 root root   18 12月 29 2013 .bash_logout
+-rw-r--r--.  1 root root  176 12月 29 2013 .bash_profile
+-rw-r--r--.  1 root root  176 12月 29 2013 .bashrc
+-rw-r--r--.  1 root root  100 12月 29 2013 .cshrc
+-rw-r--r--.  1 root root  129 12月 29 2013 .tcshrc
+[root@base ~]# ls -lh
+总用量 4.0K
+-rw-------. 1 root root 1.2K 1月  15 14:11 anaconda-ks.cfg
+
+2.pwd命令
+pwd 表示查看当前的目录路径
+[root@base ~]# pwd
+/root      #root用户的根目录  /是linux下所有目录的根目录
+
+3.cd命令
+cd 目录路径  #进入到指定的目录
+cd / #表示进入系统的根目录
+cd ~ #表示进入到当前用户的主目录 ~表示用户的主目录  cd ~ （root用户） 会进入/root目录下
+cd 回车 #也会进入到当前用户的主目录
+cd .. 表示进入当前目录的上一级目录
+绝对路径：所有以/开始的目录为绝对路径
+相对路径: 以非/开始的目录路径为相对路径
+[root@base ~]# cd /
+[root@base /]# pwd
+/
+[root@base /]# ls
+bin   dev  home  lib64  mnt  proc  run   srv  tmp  var
+boot  etc  lib   media  opt  root  sbin  sys  usr
+[root@base ~]# cd /
+[root@base /]# pwd
+/
+[root@base /]# ls
+bin   dev  home  lib64  mnt  proc  run   srv  tmp  var
+boot  etc  lib   media  opt  root  sbin  sys  usr
+[root@base /]# pwd
+/
+[root@base /]# cd ~
+[root@base ~]# pwd
+/root
+[root@base ~]# cd  ..  #表示返回上级目录
+[root@base /]# pwd
+/
+[root@base /]# cd /usr/local/share/  #表示进入到/usr/local/share目录下
+[root@base share]# pwd
+/usr/local/share
+[root@base share]# cd ../../  #表示返回两级目录，进入/usr目录
+[root@base usr]# pwd
+/usr
+[root@base usr]# cd local  #使用相对路径，进入到当前目录下的local目录
+[root@base local]# pwd
+/usr/local
+
+[root@base local]# cd ./share #进入当前目录下的share目录 .表示当前目录
+[root@base share]# pwd
+/usr/local/share
+
+
+4.mkdir命令
+mkdir 创建一个目录
+mkdir [配置项] 目录路径
+[root@base ~]# mkdir a
+[root@base ~]# ls
+a  anaconda-ks.cfg
+[root@base ~]# mkdir /root/b
+[root@base ~]# ls
+a  anaconda-ks.cfg  b
+
+mkdir -p 目录路径  #表示递归创建目录（当创建目录时，目录的上级目录不存在时，同时创建它的上级目录）
+[root@base ~]# mkdir x/y/z
+mkdir: 无法创建目录"x/y/z": 没有那个文件或目录
+[root@base ~]# mkdir -p x/y/z #创建z目录有它的上级目录x和y目录
+[root@base ~]# ls
+a  anaconda-ks.cfg  b  x
+[root@base ~]# ls x   #ls x表示查看当前目录下x目录下的所有文件
+y
+[root@base ~]# ls x/y
+z
+
+
+5.touch命令
+touch 文件路径 #创建一个文本文件
+[root@base ~]# touch 1.txt  #在当前目录创建一个1.txt
+[root@base ~]# ls
+1.txt  a  anaconda-ks.cfg  b  x
+[root@base ~]# touch /root/x/2.txt 表示在/root/x目录下创建一个2.txt文件
+[root@base ~]# ls /root/x
+2.txt  y
+
+
+6.rmdir命令
+删除目录命令
+rmdir 目录路径 #注意它只能删除空目录
+[root@base ~]# rmdir a
+[root@base ~]# ls
+1.txt  anaconda-ks.cfg  b  x
+[root@base ~]# rmdir x
+rmdir: 删除 "x" 失败: 目录非空
+
+7.rm命令
+rm [配置项] 文件路径
+[root@base ~]# rm 1.txt
+rm：是否删除普通空文件 "1.txt"？n
+[root@base ~]# ls
+1.txt  anaconda-ks.cfg  b  x
+[root@base ~]# rm 1.txt
+rm：是否删除普通空文件 "1.txt"？y
+[root@base ~]# ls
+anaconda-ks.cfg  b  x
+[root@base ~]# touch 2.txt 3.txt 4.txt 5.txt
+[root@base ~]# ls
+2.txt  3.txt  4.txt  5.txt  anaconda-ks.cfg  b  x
+[root@base ~]# rm -f 2.txt  # -f表示强制删除文件
+[root@base ~]# ls
+3.txt  4.txt  5.txt  anaconda-ks.cfg  b  x
+
+[root@base ~]# rm x  #不能直接删除目录
+rm: 无法删除"x": 是一个目录
+
+[root@base ~]# rm -r x #-r表示递归的删除目录及目录下的所有文件
+rm：是否进入目录"x"? y
+rm：是否进入目录"x/y"? y
+rm：是否删除目录 "x/y/z"？n
+rm：是否删除普通空文件 "x/2.txt"？n
+
+[root@base ~]# rm -rf x  #强制删除目录以目录下的所有内容
+[root@base ~]# ls
+3.txt  4.txt  5.txt  anaconda-ks.cfg  b
+
+[root@base ~]# ls
+3.txt  4.txt  5.txt  anaconda-ks.cfg  b
+[root@base ~]# rm -rf *.txt #表示删除当前目录下的所有的txt文件 *匹配符
+[root@base ~]# ls
+anaconda-ks.cfg  b
+
+
+
+
