@@ -1,0 +1,1067 @@
+1.ls命令
+ls命令list的缩写 表示查看目录下的文件内容
+ls  #表示查看当前目录下的文件
+ls -l #查看当前目录下文件的详细信息
+ll  #同ls -l 但这个命令不是通用的
+
+ls [选项 配置项] 目录路径  #表示查看目录下的文件内容
+ls -a  #表示查看目录下的文件包含隐藏文件
+ls -al  #查看当前目录下所有文件的详细信息
+ls -lh  #查看文件的详细信息,h是将文件大小以合适的单位显示
+[root@base ~]# ls
+anaconda-ks.cfg
+[root@base ~]# ls -l
+总用量 4
+-rw-------. 1 root root 1224 1月  15 14:11 anaconda-ks.cfg
+[root@base ~]# ll
+总用量 4
+-rw-------. 1 root root 1224 1月  15 14:11 anaconda-ks.cfg
+[root@base ~]# ls -a
+.  ..  anaconda-ks.cfg  .bash_logout  .bash_profile  .bashrc  .cshrc  .tcshrc
+[root@base ~]# ls -al
+总用量 24
+dr-xr-x---.  2 root root  114 1月  15 14:11 .
+dr-xr-xr-x. 17 root root  224 1月  15 14:10 ..
+-rw-------.  1 root root 1224 1月  15 14:11 anaconda-ks.cfg
+-rw-r--r--.  1 root root   18 12月 29 2013 .bash_logout
+-rw-r--r--.  1 root root  176 12月 29 2013 .bash_profile
+-rw-r--r--.  1 root root  176 12月 29 2013 .bashrc
+-rw-r--r--.  1 root root  100 12月 29 2013 .cshrc
+-rw-r--r--.  1 root root  129 12月 29 2013 .tcshrc
+[root@base ~]# ls -lh
+总用量 4.0K
+-rw-------. 1 root root 1.2K 1月  15 14:11 anaconda-ks.cfg
+
+2.pwd命令
+pwd 表示查看当前的目录路径
+[root@base ~]# pwd
+/root      #root用户的根目录  /是linux下所有目录的根目录
+
+3.cd命令
+cd 目录路径  #进入到指定的目录
+cd / #表示进入系统的根目录
+cd ~ #表示进入到当前用户的主目录 ~表示用户的主目录  cd ~ （root用户） 会进入/root目录下
+cd 回车 #也会进入到当前用户的主目录
+cd .. 表示进入当前目录的上一级目录
+绝对路径：所有以/开始的目录为绝对路径
+相对路径: 以非/开始的目录路径为相对路径
+[root@base ~]# cd /
+[root@base /]# pwd
+/
+[root@base /]# ls
+bin   dev  home  lib64  mnt  proc  run   srv  tmp  var
+boot  etc  lib   media  opt  root  sbin  sys  usr
+[root@base ~]# cd /
+[root@base /]# pwd
+/
+[root@base /]# ls
+bin   dev  home  lib64  mnt  proc  run   srv  tmp  var
+boot  etc  lib   media  opt  root  sbin  sys  usr
+[root@base /]# pwd
+/
+[root@base /]# cd ~
+[root@base ~]# pwd
+/root
+[root@base ~]# cd  ..  #表示返回上级目录
+[root@base /]# pwd
+/
+[root@base /]# cd /usr/local/share/  #表示进入到/usr/local/share目录下
+[root@base share]# pwd
+/usr/local/share
+[root@base share]# cd ../../  #表示返回两级目录，进入/usr目录
+[root@base usr]# pwd
+/usr
+[root@base usr]# cd local  #使用相对路径，进入到当前目录下的local目录
+[root@base local]# pwd
+/usr/local
+
+[root@base local]# cd ./share #进入当前目录下的share目录 .表示当前目录
+[root@base share]# pwd
+/usr/local/share
+
+
+4.mkdir命令
+mkdir 创建一个目录
+mkdir [配置项] 目录路径
+[root@base ~]# mkdir a
+[root@base ~]# ls
+a  anaconda-ks.cfg
+[root@base ~]# mkdir /root/b
+[root@base ~]# ls
+a  anaconda-ks.cfg  b
+
+mkdir -p 目录路径  #表示递归创建目录（当创建目录时，目录的上级目录不存在时，同时创建它的上级目录）
+[root@base ~]# mkdir x/y/z
+mkdir: 无法创建目录"x/y/z": 没有那个文件或目录
+[root@base ~]# mkdir -p x/y/z #创建z目录有它的上级目录x和y目录
+[root@base ~]# ls
+a  anaconda-ks.cfg  b  x
+[root@base ~]# ls x   #ls x表示查看当前目录下x目录下的所有文件
+y
+[root@base ~]# ls x/y
+z
+
+
+5.touch命令
+touch 文件路径 #创建一个文本文件
+[root@base ~]# touch 1.txt  #在当前目录创建一个1.txt
+[root@base ~]# ls
+1.txt  a  anaconda-ks.cfg  b  x
+[root@base ~]# touch /root/x/2.txt 表示在/root/x目录下创建一个2.txt文件
+[root@base ~]# ls /root/x
+2.txt  y
+
+
+6.rmdir命令
+删除目录命令
+rmdir 目录路径 #注意它只能删除空目录
+[root@base ~]# rmdir a
+[root@base ~]# ls
+1.txt  anaconda-ks.cfg  b  x
+[root@base ~]# rmdir x
+rmdir: 删除 "x" 失败: 目录非空
+
+7.rm命令
+rm [配置项] 文件路径
+[root@base ~]# rm 1.txt
+rm：是否删除普通空文件 "1.txt"？n
+[root@base ~]# ls
+1.txt  anaconda-ks.cfg  b  x
+[root@base ~]# rm 1.txt
+rm：是否删除普通空文件 "1.txt"？y
+[root@base ~]# ls
+anaconda-ks.cfg  b  x
+[root@base ~]# touch 2.txt 3.txt 4.txt 5.txt
+[root@base ~]# ls
+2.txt  3.txt  4.txt  5.txt  anaconda-ks.cfg  b  x
+[root@base ~]# rm -f 2.txt  # -f表示强制删除文件
+[root@base ~]# ls
+3.txt  4.txt  5.txt  anaconda-ks.cfg  b  x
+
+[root@base ~]# rm x  #不能直接删除目录
+rm: 无法删除"x": 是一个目录
+
+[root@base ~]# rm -r x #-r表示递归的删除目录及目录下的所有文件
+rm：是否进入目录"x"? y
+rm：是否进入目录"x/y"? y
+rm：是否删除目录 "x/y/z"？n
+rm：是否删除普通空文件 "x/2.txt"？n
+
+[root@base ~]# rm -rf x  #强制删除目录以目录下的所有内容
+[root@base ~]# ls
+3.txt  4.txt  5.txt  anaconda-ks.cfg  b
+
+[root@base ~]# ls
+3.txt  4.txt  5.txt  anaconda-ks.cfg  b
+[root@base ~]# rm -rf *.txt #表示删除当前目录下的所有的txt文件 *匹配符
+[root@base ~]# ls
+anaconda-ks.cfg  b
+
+8.echo命令
+echo 输出命令
+[root@base ~]# echo abcd
+abcd
+
+>文件输出符号：如果文件不存在会创建文件，如果文件存在会覆盖文件的内容
+>>文件输出符号：如果文件不存在会创建文件，如果文件存在，会在文件末尾追加内容
+[root@base ~]# echo 1234 > 1.txt
+[root@base ~]# ls
+1.txt  anaconda-ks.cfg  b
+[root@base ~]# cat 1.txt
+1234
+[root@base ~]# echo abcd >> 1.txt
+[root@base ~]# ls
+1.txt  anaconda-ks.cfg  b
+[root@base ~]# cat 1.txt
+1234
+abcd
+
+9.free命令
+free查看内存使用情况
+[root@base ~]# free
+              total        used        free      shared  buff/cache   available
+Mem:         997956      137784      705348        7796      154824      689948
+Swap:       2097148           0     2097148
+[root@base ~]# free -h
+              total        used        free      shared  buff/cache   available
+Mem:           974M        134M        688M        7.6M        151M        673M
+Swap:          2.0G          0B        2.0G
+10.df命令
+df查看硬盘使用情况
+[root@base ~]# df
+文件系统                   1K-块    已用     可用 已用% 挂载点
+/dev/mapper/centos-root 17811456 1147104 16664352    7% /
+devtmpfs                  486748       0   486748    0% /dev
+tmpfs                     498976       0   498976    0% /dev/shm
+tmpfs                     498976    7796   491180    2% /run
+tmpfs                     498976       0   498976    0% /sys/fs/cgroup
+/dev/sda1                1038336  132396   905940   13% /boot
+tmpfs                      99796       0    99796    0% /run/user/0
+[root@base ~]# df -h
+文件系统                 容量  已用  可用 已用% 挂载点
+/dev/mapper/centos-root   17G  1.1G   16G    7% /
+devtmpfs                 476M     0  476M    0% /dev
+tmpfs                    488M     0  488M    0% /dev/shm
+tmpfs                    488M  7.7M  480M    2% /run
+tmpfs                    488M     0  488M    0% /sys/fs/cgroup
+/dev/sda1               1014M  130M  885M   13% /boot
+tmpfs                     98M     0   98M    0% /run/user/0
+
+11.查看命令
+cat 命令:查看文件的所有内容
+cat 文件路径
+[root@base ~]# cat 1.txt
+1234
+abcd
+
+more命令：分页查看文件内容
+   q可以退出查看
+
+less命令:分页查看文件内容
+   q可以退出查看
+head命令:从文件头开始查看文件
+   head [配置项] 文件路径 #默认查看文件的前10行内容
+[root@base ~]# head /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+bin:x:1:1:bin:/bin:/sbin/nologin
+daemon:x:2:2:daemon:/sbin:/sbin/nologin
+adm:x:3:4:adm:/var/adm:/sbin/nologin
+lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
+sync:x:5:0:sync:/sbin:/bin/sync
+shutdown:x:6:0:shutdown:/sbin:/sbin/shutdown
+halt:x:7:0:halt:/sbin:/sbin/halt
+mail:x:8:12:mail:/var/spool/mail:/sbin/nologin
+operator:x:11:0:operator:/root:/sbin/nologin
+[root@base ~]# head -3 /etc/passwd #查看文件的前3行数据
+root:x:0:0:root:/root:/bin/bash
+bin:x:1:1:bin:/bin:/sbin/nologin
+daemon:x:2:2:daemon:/sbin:/sbin/nologin
+
+tail命令:从文件尾部查看文件内容
+   tail [配置项] 文件路径  #查看文件的后10行
+   tail -n 文件路径 #查看文件的后n行数据
+   [root@base ~]# tail /etc/passwd
+operator:x:11:0:operator:/root:/sbin/nologin
+games:x:12:100:games:/usr/games:/sbin/nologin
+ftp:x:14:50:FTP User:/var/ftp:/sbin/nologin
+nobody:x:99:99:Nobody:/:/sbin/nologin
+systemd-network:x:192:192:systemd Network Management:/:/sbin/nologin
+dbus:x:81:81:System message bus:/:/sbin/nologin
+polkitd:x:999:998:User for polkitd:/:/sbin/nologin
+sshd:x:74:74:Privilege-separated SSH:/var/empty/sshd:/sbin/nologin
+postfix:x:89:89::/var/spool/postfix:/sbin/nologin
+chrony:x:998:996::/var/lib/chrony:/sbin/nologin
+[root@base ~]# tail -2 /etc/passwd
+postfix:x:89:89::/var/spool/postfix:/sbin/nologin
+chrony:x:998:996::/var/lib/chrony:/sbin/nologin
+
+ tail -f 文件路径 #表示动态查看文件的最新内容（用来查看日志文件等，动态改变的文件）
+ 
+ Ctrl+C:停止
+
+
+last命令：一般用来查看特殊文件，查看文件最新的内容（其他编码的文件）
+
+12.查找命令
+find 查找文件
+find [配置项] 要查找的目录 要查找的文件 #默认在当前目录下查找
+[root@base ~]# find *.txt  #表示在当前目录下查找txt文件
+1.txt
+[root@base ~]# find /root *.txt  #在/root目录下查找txt文件
+/root
+/root/.bash_logout
+/root/.bash_profile
+/root/.bashrc
+/root/.cshrc
+/root/.tcshrc
+/root/anaconda-ks.cfg
+/root/b
+/root/1.txt
+1.txt
+
+[root@base ~]# find -name *.txt  #-name表示按名字查找文件 查找当前目录下的txt文件
+./1.txt
+
+[root@base ~]# find -name *.txt
+./1.txt
+[root@base ~]# find -amin 10
+[root@base ~]# find -amin +10
+.
+./.bash_logout
+./.bash_profile
+./.bashrc
+./.cshrc
+./.tcshrc
+./anaconda-ks.cfg
+
+whereis命令
+whereis查看软件的安装目录
+[root@base ~]# whereis python
+python: /usr/bin/python /usr/bin/python2.7 /usr/lib/python2.7 /usr/lib64/python2.7 /etc/python /usr/include/python2.7 /usr/share/man/man1/python.1.gz
+
+who 命令 查看当前系统的连接信息
+[root@base ~]# who
+root     tty1         2021-01-18 09:07
+root     pts/0        2021-01-18 09:09 (192.168.20.1)
+root     pts/1        2021-01-18 13:58 (192.168.20.1)
+[root@base ~]# who
+root     tty1         2021-01-18 09:07
+root     pts/0        2021-01-18 09:09 (192.168.20.1)
+
+whoami命令 #查看当前用户
+[root@base ~]# whoami
+root
+
+grep命令 #查找文本内容
+grep 要查找的内容 文本文件路径
+[root@base ~]# grep root /etc/passwd #表示在/etc/passwd中查找包含root的行
+root:x:0:0:root:/root:/bin/bash
+operator:x:11:0:operator:/root:/sbin/nologin
+grep -v 不包含的内容  文本文件路径 #表示查找文件中不包含某个字符串的行
+
+[root@base ~]# grep root /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+operator:x:11:0:operator:/root:/sbin/nologin
+[root@base ~]# grep -v root /etc/passwd
+bin:x:1:1:bin:/bin:/sbin/nologin
+daemon:x:2:2:daemon:/sbin:/sbin/nologin
+adm:x:3:4:adm:/var/adm:/sbin/nologin
+lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
+sync:x:5:0:sync:/sbin:/bin/sync
+shutdown:x:6:0:shutdown:/sbin:/sbin/shutdown
+halt:x:7:0:halt:/sbin:/sbin/halt
+mail:x:8:12:mail:/var/spool/mail:/sbin/nologin
+games:x:12:100:games:/usr/games:/sbin/nologin
+ftp:x:14:50:FTP User:/var/ftp:/sbin/nologin
+nobody:x:99:99:Nobody:/:/sbin/nologin
+systemd-network:x:192:192:systemd Network Management:/:/sbin/nologin
+dbus:x:81:81:System message bus:/:/sbin/nologin
+polkitd:x:999:998:User for polkitd:/:/sbin/nologin
+sshd:x:74:74:Privilege-separated SSH:/var/empty/sshd:/sbin/nologin
+postfix:x:89:89::/var/spool/postfix:/sbin/nologin
+chrony:x:998:996::/var/lib/chrony:/sbin/nologin
+
+13.hostname命令
+查看当前的主机名称
+[root@base ~]# hostname
+base
+
+14.修改主机名称
+hostnamectl命令
+hostnamectl set-hostname 新的主机名  #修改主机名
+[root@base ~]# hostnamectl set-hostname oracle
+[root@base ~]# hostname
+oracle
+
+15.网络命令
+ip addr #查看当前网卡信息
+
+ping命令 #查看网络连通性的
+
+
+安装net-tools工具包后才能使用ifconfig,netstat
+yum -y install net-tools #安装网络工具包
+
+ifconfig #查看网卡信息
+ifconfig -a #查看所有网卡信息
+
+手动配置网卡：网卡文件位置 /etc/sysconfig/network-scripts/
+              网卡文件名： 以“ifcfg-”开头,后面是网卡名字
+#网卡类型
+TYPE="Ethernet"
+#代理方法
+PROXY_METHOD="none"
+BROWSER_ONLY="no"
+#IP地址分配协议  DHCP:自动获取IP地址 STATIC:静态地址（手动配置）NONE:（手动配置IP）
+BOOTPROTO="dhcp"
+#配置是否走默认路由
+DEFROUTE="yes"
+IPV4_FAILURE_FATAL="no"
+IPV6INIT="yes"
+IPV6_AUTOCONF="yes"
+IPV6_DEFROUTE="yes"
+IPV6_FAILURE_FATAL="no"
+IPV6_ADDR_GEN_MODE="stable-privacy"
+#网卡名称
+NAME="ens33"
+#UUID唯一标识
+UUID="6e704847-21b0-4d5b-b378-d11cd328409c"
+#设备名称(网卡名称)
+DEVICE="ens33"
+#是否开机启动no
+ONBOOT="yes"
+
+静态IP地址的配置
+BOOTPROTO='static' #none  这个不是新增加的配置，修改原来配置即可
+
+#新添加的配置
+
+#配置IP地址
+IPADDR=192.168.20.88   #前3位是自动路由器中的地址 ，后一们自己配置
+#子网掩码配置
+NETMASK=255.255.255.0
+#网关的配置
+GATEWAY=192.168.20.2
+#配置dns服务器（域名解析服务器）
+DNS1=192.168.20.2
+DNS2=192.168.20.0
+
+
+service network stop #关闭网络连接
+service network start#连接网络
+service network restart#重启网络
+
+netstat #用来查看网络状态的
+[root@oracle ~]# netstat -tnulp  #查看当前系统中运行的程序所占用的网络端口
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      996/sshd            
+tcp        0      0 127.0.0.1:25            0.0.0.0:*               LISTEN      1164/master         
+tcp6       0      0 :::22                   :::*                    LISTEN      996/sshd            
+tcp6       0      0 ::1:25                  :::*                    LISTEN      1164/master         
+udp        0      0 127.0.0.1:323           0.0.0.0:*                           642/chronyd         
+udp        0      0 0.0.0.0:68              0.0.0.0:*                           2564/dhclient       
+udp6       0      0 ::1:323                 :::*                                642/chronyd      
+
+wget和curl属于了解命令
+yum -y install wget
+wget 下载链接 #从网络上下载文件
+
+curl 地址#访问网页
+
+16.防火墙命令
+ centos7
+ systemctl status firewalld  #查看当前防火墙状态
+ systemctl start firewalld #打开防火墙
+ systemctl stop firewalld #关闭防火墙
+ systemctl disable firewalld #关闭防火墙的随机启动
+ systemctl enable firewalld #让防火墙随机启动
+
+
+ centos6及6以下版本
+ service iptables stop  #关闭防火墙
+ service iptables start #打开防火墙
+
+ chkconfig iptables off|on #off永久关闭防火墙|on表示打开 
+
+
+ systemctl：启动关闭服务用的
+ systemctl start|stop|restart|enable|disable|status  服务名
+ service:它linux上启动服务命令
+ service 服务名 start|stop|restart|status
+ service network restart
+
+
+17.mv命令
+mv 命令移动命令也可以用来改名
+
+mv 原文件 目标目录或文件
+[root@oracle ~]# touch 1.txt 2.txt 3.txt
+[root@oracle ~]# mkdir -p a b c x/y/z
+[root@oracle ~]# ls
+1.txt  2.txt  3.txt  a  anaconda-ks.cfg  b  c  x
+[root@oracle ~]# mv 1.txt 4.txt   #将1.txt改名为4.txt
+[root@oracle ~]# ls
+2.txt  3.txt  4.txt  a  anaconda-ks.cfg  b  c  x
+[root@oracle ~]# mv a aa #将目录a改名为aa
+[root@oracle ~]# ls
+2.txt  3.txt  4.txt  aa  anaconda-ks.cfg  b  c  x
+
+[root@oracle ~]# mv 1.txt 2.txt #将1.txt的内容复制到2.txt中
+mv：是否覆盖"2.txt"？ y
+[root@oracle ~]# ls
+2.txt  3.txt  4.txt  aa  anaconda-ks.cfg  b  c  x
+[root@oracle ~]# cat 2.txt
+abcd
+
+[root@oracle ~]# mv 2.txt aa #将2.txt移到到aa目录下
+[root@oracle ~]# ls
+3.txt  4.txt  aa  anaconda-ks.cfg  b  c  x
+[root@oracle ~]# ls aa
+2.txt
+
+[root@oracle ~]# mv 3.txt b/5.txt  #将3.txt移动到b目录下并改名为5.txt
+[root@oracle ~]# ls b
+5.txt
+[root@oracle ~]# ls
+4.txt  aa  anaconda-ks.cfg  b  c  x
+
+
+18.cp命令
+cp命令:copy 复制命令
+
+cp 原文件 目录文件   #可以复制文件，也可以复制目录，复制目录时加-r参数
+[root@oracle ~]# cp 4.txt 1.txt #将4.txt复制一份保存为1.txt
+[root@oracle ~]# ls
+1.txt  4.txt  aa  anaconda-ks.cfg  b  c  x
+
+[root@oracle ~]# cp 4.txt c #将4.txt复制到c目录下
+[root@oracle ~]# ls c
+4.txt
+[root@oracle ~]# ls
+1.txt  4.txt  aa  anaconda-ks.cfg  b  c  x
+
+
+[root@oracle ~]# cp -r aa b #将aa目录复制到b目录下
+[root@oracle ~]# ls b
+5.txt  aa
+
+[root@oracle ~]# cp -r aa/* x  #将aa目录下的所有内容复制到x目录下
+[root@oracle ~]# ls
+1.txt  4.txt  aa  anaconda-ks.cfg  b  c  x
+[root@oracle ~]# ls x
+2.txt  y
+
+19.vi/vim命令
+yum -y install vim
+
+vim命令:文本编辑工具
+
+vim 文件路径
+
+非编辑模式命令
+i:表示在光标当前行插入内容，并且进入编辑模式
+o:表示在光标当前行的下一行插入一个新行，并且进入编辑模式
+
+:w:表示保存
+:q:表示退出
+:wq:表示保存并退出
+:w!:表示强制保存
+:q!:表示强制退出，不保存
+:wq!:表示强制保存并退出
+
+:set nu  #:set number 表示在编辑时显示行号
+:set nonu #取消行号显示
+yy :表示复制一行内容
+p :表示粘贴
+u:表示撤消
+ctrl+r:表示撤回
+ctrl+f:向下翻页
+ctrl+b:向上翻页
+:%s/原内容/新内容/[gi]  表示对文本进行全文替换 g global全局的 i ignorecase忽略大小写
+:s/原内容/新的内容/gi   表示替换当前行的内容
+:n1,n2s/原内容/新的内容/gi  表示替换n1行到n2行之间的内容
+dd:表示删除一行内容
+注意："/"可以是其他字符 # 
+
+
+编辑模式
+ESC：退出编辑模式
+
+
+20.压缩命令
+yum -y install zip unzip
+zip/unzip
+zip 压缩文件名(.zip) 要压缩的内容
+[root@oracle ~]# zip 1.zip 1.txt
+  adding: 1.txt (deflated 40%)
+[root@oracle ~]# ls
+1.txt  1.zip  4.txt  aa  anaconda-ks.cfg  b  c  x
+
+unzip 压缩文件 -d 解压目录
+[root@oracle ~]# unzip 1.zip 
+Archive:  1.zip
+  inflating: 1.txt   
+[root@oracle ~]# unzip 1.zip -d b
+Archive:  1.zip
+  inflating: b/1.txt                 
+[root@oracle ~]# ls b
+1.txt  5.txt  aa
+-l参数不解压，查看压缩包的内容
+[root@oracle ~]# unzip -l 1.zip #查看1.zip压缩包的目录
+Archive:  1.zip
+  Length      Date    Time    Name
+---------  ---------- -----   ----
+      118  01-19-2021 10:06   1.txt
+---------                     -------
+      118                     1 file
+
+tar
+可以处理.tar或者.tar.gz压缩包
+tar -cvf 压缩文件名(.tar)  要压缩的文件
+
+[root@oracle ~]# tar -cvf aa.tar aa
+aa/
+aa/2.txt
+[root@oracle ~]# ls
+1.txt  1.zip  4.txt  aa  aa.tar  anaconda-ks.cfg  b  c  x
+
+tar -xvf tar压缩包路径 -C 解压目录 #解压
+[root@oracle ~]# tar -xvf aa.tar
+aa/
+aa/2.txt
+[root@oracle ~]# ls
+1.txt  1.zip  4.txt  aa  aa.tar  anaconda-ks.cfg  b  c  x
+[root@oracle ~]# tar -xvf aa.tar -C b
+aa/
+aa/2.txt
+[root@oracle ~]# ls b
+1.txt  5.txt  aa
+
+
+tar -zcvf tar.gz压缩包名  要压缩的文件
+[root@oracle ~]# tar -zcvf anaconda-ks.cfg.tar.gz anaconda-ks.cfg 
+anaconda-ks.cfg
+[root@oracle ~]# ls
+1.txt  4.txt  aa.tar           anaconda-ks.cfg.tar.gz  c
+1.zip  aa     anaconda-ks.cfg  b                       x
+[root@oracle ~]# rm -rf anaconda-ks.cfg
+[root@oracle ~]# ls
+1.txt  1.zip  4.txt  aa  aa.tar  anaconda-ks.cfg.tar.gz  b  c  x
+
+
+tar -zxvf tar.gz压缩包路径 -C 解压目录
+[root@oracle ~]# tar -zxvf anaconda-ks.cfg.tar.gz 
+anaconda-ks.cfg
+[root@oracle ~]# ls
+1.txt  4.txt  aa.tar           anaconda-ks.cfg.tar.gz  c
+1.zip  aa     anaconda-ks.cfg  b                       x
+[root@oracle ~]# tar -zxvf anaconda-ks.cfg.tar.gz -C c
+anaconda-ks.cfg
+[root@oracle ~]# ls c
+4.txt  anaconda-ks.cfg
+
+
+21.man命令
+man命令：查看命令的命令，可以查看到命令的详细信息
+
+help配置项
+--help -h --h -help
+
+22.用户相关命令
+用户组：
+groupadd 用户组名  #创建一个用户组
+groupdel 用户组名  #删除用户组
+groupmod 用户组  -n 新的名字  #修改用户组
+[root@oracle ~]# groupadd g1
+[root@oracle ~]# groupadd g2
+[root@oracle ~]# groupadd g3
+[root@oracle ~]# groupdel g3
+[root@oracle ~]# groupmod g2 -n g3
+用户:
+useradd 用户名 -g 用户组名 -G 用户组
+userdel 用户名 删除用户
+[root@oracle ~]# groupmod g3 -n g2
+[root@oracle ~]# ls /home
+[root@oracle ~]# useradd user1 -g g1 -G g2
+[root@oracle ~]# ls /home
+user1
+
+修改用户密码:
+passwd 用户名  #修改用户密码
+[root@oracle ~]# passwd user1
+更改用户 user1 的密码 。
+新的 密码：
+无效的密码： 密码少于 8 个字符
+重新输入新的 密码：
+passwd：所有的身份验证令牌已经成功更新。
+id命令查看用户的ID
+[root@oracle ~]# id user1
+uid=1000(user1) gid=1000(g1) 组=1000(g1),1001(g2)
+
+su命令
+su 用户名  #切换用户时，不加载用户的环境变量
+su - 用户名 #切换用户时，加载用户的环境变量
+[root@oracle ~]# su user1
+[user1@oracle root]$ pwd
+/root
+[user1@oracle root]$ exit
+exit
+[root@oracle ~]# su - user1
+上一次登录：二 1月 19 22:13:18 CST 2021pts/0 上
+[user1@oracle ~]$ pwd
+/home/user1
+
+23权限相关命令
+chown命令:它是设置目录的所有权限
+chown -R 用户名:用户组 目录路径  #将目录的使用权赋值给某个用户
+[root@oracle ~]# ll
+总用量 8
+-rw-r--r--. 1 root root   95 1月  19 10:06 1.txt.gz
+drwxr-xr-x. 2 root root   19 1月  19 09:51 aa
+-rw-------. 1 root root 1224 1月  15 14:11 anaconda-ks.cfg
+drwxr-xr-x. 3 root root   42 1月  19 13:58 b
+drwxr-xr-x. 2 root root   42 1月  19 14:08 c
+drwxr-xr-x. 3 root root   28 1月  19 09:58 x
+[root@oracle ~]# chown -R user1 aa #将aa目录的所属用户改为user1
+[root@oracle ~]# ll
+总用量 8
+-rw-r--r--. 1 root  root   95 1月  19 10:06 1.txt.gz
+drwxr-xr-x. 2 user1 root   19 1月  19 09:51 aa
+-rw-------. 1 root  root 1224 1月  15 14:11 anaconda-ks.cfg
+drwxr-xr-x. 3 root  root   42 1月  19 13:58 b
+drwxr-xr-x. 2 root  root   42 1月  19 14:08 c
+drwxr-xr-x. 3 root  root   28 1月  19 09:58 x
+[root@oracle ~]# chown -R user1:g1 b
+[root@oracle ~]# ll
+总用量 8
+-rw-r--r--. 1 root  root   95 1月  19 10:06 1.txt.gz
+drwxr-xr-x. 2 user1 root   19 1月  19 09:51 aa
+-rw-------. 1 root  root 1224 1月  15 14:11 anaconda-ks.cfg
+drwxr-xr-x. 3 user1 g1     42 1月  19 13:58 b
+drwxr-xr-x. 2 root  root   42 1月  19 14:08 c
+drwxr-xr-x. 3 root  root   28 1月  19 09:58 x
+
+chmod命令：设置的是用户的操作权限
+表示文件类型       用户权限         用户组权限           其他用户权限
+                      u                 g                     o
+-：文件              r:读              r：读                r:读
+d:目录               w:写              w:写                 w:写
+l:表示链接           x:执行            x：执行              x:执行
+                     -：表示无权限     -：表示无权限        -：表示没有权限
+-                     rw-                r--                  r--            .1 root  root   95 1月  19 10:06 1.txt.gz
+d                     rwx                r-x                  r-x            .2 user1 root   19 1月  19 09:51 aa
+
+chmod -R 权限 文件路径 #修改文件的权限
+[root@oracle ~]# chmod -R u+x 1.txt.gz  #1.txt.gz的用户添加执行权限
+[root@oracle ~]# ll
+总用量 8
+-rwxr--r--. 1 root  root   95 1月  19 10:06 1.txt.gz
+[root@oracle ~]# chmod -R u-x 1.txt.gz  #1.txt.gz的用户去掉执行权限
+
+[root@oracle ~]# ll
+总用量 8
+-rw-r--r--. 1 root  root   95 1月  19 10:06 1.txt.gz
+[root@oracle ~]# chmod -R o+w 1.txt.gz #1.txt.gz的其他用户添加写权限
+[root@oracle ~]# ll
+总用量 8
+-rw-r--rw-. 1 root  root   95 1月  19 10:06 1.txt.gz
+[root@oracle ~]# chmod -R a+x 1.txt.gz  #1.txt.gz的所有用户添加执行权限
+[root@oracle ~]# ll
+总用量 8
+-rwxr-xrwx. 1 root  root   95 1月  19 10:06 1.txt.gz
+[root@oracle ~]# chmod -R a-x 1.txt.gz #去掉1.txt.gz的执行权限
+[root@oracle ~]# ll
+总用量 8
+-rw-r--rw-. 1 root  root   95 1月  19 10:06 1.txt.gz
+
+
+r:表示读权限 4
+w:表示写权限 2
+x:表示执行权限 1
+用户权限        用户组权限            其他用户权限
+7                 5			5：rwxr-xr-x
+7                 7			7: rwxrwxrwx
+7                 6			6: rwxrw-rw-
+
+[root@oracle ~]# chmod -R 766 1.txt.gz 
+[root@oracle ~]# ll
+总用量 8
+-rwxrw-rw-. 1 root  root   95 1月  19 10:06 1.txt.gz
+[root@oracle ~]# ll
+总用量 8
+-rwxr-xr-x. 1 root  root   95 1月  19 10:06 1.txt.gz
+
+24.ps命令
+ps命令：查看系统进程的命令
+[root@oracle ~]# ps
+   PID TTY          TIME CMD
+  2646 pts/0    00:00:00 bash
+  2753 pts/0    00:00:00 ps
+
+
+ps -aux  #查看系统进程 
+
+ps -ef 
+
+25.|通道符
+|可以将多个命令连接到一起，作用将前面命令的执行结果传递给后面的命令
+
+ps -aux | grep ssh  #查看包含ssh命令的进程 
+
+26.kill命令
+kill：结束进程命令
+[root@oracle ~]# kill 1904
+[root@oracle ~]# kill 2642
+
+kill -9 进程id #强制结束进程
+
+yum install psmisc -y
+killall 进程名称  #结束所有进程 
+killall java  #结束掉电脑上所有的java进程
+[root@oracle ~]# killall sshd  #慎用
+
+27.wc命令
+wc：word count #数据字数，可以数文件的行数据，文件的字节数，单词数
+wc -l  文本文件路径 #查看文本文件的行数
+wc -w  文本文件路径  #查看文本文件的单词数
+wc -c  ......       #查看字节数
+wc -m  。。。。。。 #查看字符数
+
+[root@oracle ~]# wc -l 1.txt
+8 1.txt
+[root@oracle ~]# wc -w 1.txt
+12 1.txt
+[root@oracle ~]# wc -c 1.txt
+58 1.txt
+[root@oracle ~]# wc -m 1.txt
+58 1.txt
+
+28.date命令
+date：日期操作命令
+日期格式
+%Y：表示年
+%m:表示月
+%d:表示日
+%H:表示小时
+%M:表示分钟
+%S：表示秒
+date +日期格式
+[root@oracle ~]# date
+2021年 01月 20日 星期三 09:35:28 CST
+[root@oracle ~]# date +%Y-%m-%d%H:%M:%S
+2021-01-2009:37:26
+[root@oracle ~]# date "+%Y-%m-%d %H:%M:%S"
+2021-01-20 09:37:38
+[root@oracle ~]# date "+%Y-%m-%d"
+2021-01-20
+date -s 日期时间  #设置日期时间
+[root@oracle ~]# date -s "2020-12-21 12:01:32"
+2020年 12月 21日 星期一 12:01:32 CST
+[root@oracle ~]# date -s 2020-12-20
+2020年 12月 20日 星期日 00:00:00 CST
+
+29.cut命令
+cut截取命令
+cut -f n -d 分隔符 #按指定的分隔符将文本分为多列 -f n n是一个字符数表示取第n列的数据  -d指定分隔符
+                    默认的分隔符是/t
+[root@oracle ~]# cut -f 1 2.txt
+10
+20
+30
+[root@oracle ~]# cut -f 2 2.txt
+dept1
+dept2
+dept3
+[root@oracle ~]# vim 3.txt 
+[root@oracle ~]# cat 3.txt
+10,dept1,loc1
+20,dept2,loc2
+30,dept3,loc3
+[root@oracle ~]# cut -f 3 3.txt
+10,dept1,loc1
+20,dept2,loc2
+30,dept3,loc3
+[root@oracle ~]# cut -f 3 -d ',' 3.txt
+loc1
+loc2
+loc3
+
+30.sed命令
+sed处理文件内容的，按行处理
+sed [配置项] 命令
+p:print打印
+-n:表示只打印指定行
+-i:表示修改文本
+a:表示追加
+d:表示删除
+s/原字符串/新的字符串/gi:表示替换
+[root@oracle ~]# sed '2p' 3.txt  #查看文本的第2行，显示文本的所有内容
+10,dept1,loc1
+20,dept2,loc2
+20,dept2,loc2
+30,dept3,loc3
+[root@oracle ~]# sed -n '2p' 3.txt #只打印文本的第2行
+20,dept2,loc2
+[root@oracle ~]# sed -n '1,3p' 3.txt #打印文本的1到3行
+10,dept1,loc1
+20,dept2,loc2
+30,dept3,loc3
+[root@oracle ~]# sed -i '2a hello world' 3.txt #在文本的第2行后面添加一行内容
+[root@oracle ~]# cat 3.txt
+10,dept1,loc1
+20,dept2,loc2
+hello world
+30,dept3,loc3
+[root@oracle ~]# sed -i '3d' 3.txt  #删除文本的第3行
+[root@oracle ~]# cat 3.txt
+10,dept1,loc1
+20,dept2,loc2
+30,dept3,loc3
+[root@oracle ~]# sed -i 's/loc/locc/gi' 3.txt #替换文本中的loc为locc
+[root@oracle ~]# cat 3.txt
+10,dept1,locc1
+20,dept2,locc2
+30,dept3,locc3
+
+31.awk命令
+awk编辑文本内容的，按列编辑
+awk [配置项] 命令
+[root@oracle ~]# cat 4.txt
+10 dept1 loc1
+20 dept2 loc2
+30 dept3 loc3
+[root@oracle ~]# awk '{ print $1 }' 4.txt  #表示取文件的第1列
+10
+20
+30
+
+
+-F 指定列和列之间的分隔符
+print:表示打印
+$n:表示取第n列 n是一个自然数
+[root@oracle ~]# awk '{ print $2 }' 4.txt #取文件4.txt的第2列
+dept1
+dept2
+dept3
+[root@oracle ~]# awk -F ',' '{ print $3 }' 3.txt  #取文件3.txt的第3列
+locc1
+locc2
+locc3
+
+[root@oracle ~]# awk -F ',' '{ print $1 "=" $2}' 3.txt #取3.txt中的第1列和第2列并把两列用=连接
+10=dept1
+20=dept2
+30=dept3
+
+32.ssh命令
+ssh命令远程连接linux终端的命令
+ssh 用户名[:密码]@ip地址|域名|主机名:端口号
+root@oracle ~]# ssh user1@oracle
+Last login: Tue Jan 19 22:14:01 2021
+
+
+33.scp命令
+scp命令远程拷贝命令
+scp -r 本地文件路径  远程用户名@ip:远程路径  #将本地文件拷贝到远程服务器
+
+[root@oracle ~]# scp -r 1.txt user1@192.168.20.88:/home/user1  #将当前目录/root/1.txt拷贝到远程服务器的/home/user1目录下
+The authenticity of host '192.168.20.88 (192.168.20.88)' can't be established.
+ECDSA key fingerprint is SHA256:LImuliHDAXzYQdJmjcQexnQhcz1QmKiOO2CwMV2fQ/8.
+ECDSA key fingerprint is MD5:c6:d7:7c:7c:b7:78:c1:4b:cd:7e:e1:6f:b4:c7:f1:4d.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added '192.168.20.88' (ECDSA) to the list of known hosts.
+user1@192.168.20.88's password: 
+1.txt                      100%   58    58.2KB/s   00:00  
+
+scp -r 远程用户名@ip:路径   本地路径  #将远程文件拷贝到本地
+
+[root@oracle ~]# mkdir m
+[root@oracle ~]# scp -r user1@oracle:~/1.txt m  #将远程的/home/user1/1.txt文件拷贝到本地目录/root/m下
+user1@oracle's password: 
+1.txt                                           100%   58    45.3KB/s   00:00    
+
+scp -r 远程1用户@ip:路径   远程2用户@ip：路径  #将文件从一台服务器，拷贝到另一台
+
+[root@oracle ~]# scp -r root@oracle:/root/1.txt.gz  user1@oracle:/home/user1/
+root@oracle's password: 
+user1@oracle's password: 
+1.txt.gz                                        100%   95    60.0KB/s   00:00    
+Connection to oracle closed.
+
+34.多行输入命令
+<<EOF  
+...
+...
+..
+EOF
+将<<EOF和EOF之间的内容传给前面的命令,注意EOF可以是任何字符串
+[root@oracle ~]# cat <<EOF
+> QWER
+> IQWER
+> IIIEWR
+> IIIWQEIJR
+> KKFDJ
+> KEWKRJ
+> KSKJFD
+> KAKFDS
+> EOF
+QWER
+IQWER
+IIIEWR
+IIIWQEIJR
+KKFDJ
+KEWKRJ
+KSKJFD
+KAKFDS
+[root@oracle ~]# cat <<a
+> 1
+> 23
+> 4
+> a
+1
+23
+4
+35.ftp/sftp命令
+sftp 用户名[:密码]@ip
+[root@oracle ~]# sftp root@192.168.20.88
+root@192.168.20.88's password: 
+Connected to 192.168.20.88.
+sftp> put 2.txt m   #将当前本地目录下的文件2.txt上传到服务器的/root/m目录
+Uploading 2.txt to /root/m/2.txt
+2.txt                                           100%   42   114.5KB/s   00:00    
+sftp> get /root/m/2.txt  b  #将服务器上/root/m/2.txt下载到本地当前目录/root/b下
+Fetching /root/m/2.txt to b/2.txt
+/root/m/2.txt                                   100%   42   127.3KB/s   00:00    
+sftp> exit
+
+get:表示下载
+put：表示上传
+常用命令mkdir ls rm cd pwd等命令都可以使用在sftp或ftp命令中
+如果直接使用命令表示操作服务器文件
+如果命令前加上!表示操作本地文件
+
+sftp> ls
+1.txt               1.txt.gz            2.txt               3.txt               
+4.txt               aa                  anaconda-ks.cfg     b                   
+c                   m                   x                   
+sftp> !ls
+1.txt  1.txt.gz  2.txt	3.txt  4.txt  aa  anaconda-ks.cfg  b  c  m  x
+sftp> pwd
+Remote working directory: /root
+sftp> !pwd
+/root
+sftp> cd m
+sftp> pwd
+Remote working directory: /root/m
+sftp> !pwd
+
+
+36.export命令
+export导入命令
+export 变量名=值   #将变量导入到环境变量中
+
+PS1:指定linux终端的显示格式
+\u:表示用户
+\h:表示主机名
+\w:表示全路径 \W:表示当前目录名
+[root@oracle ~]# export PS1="[\u 我是谁] $ "
+[root 我是谁] $ export PS1="[\u@\h \W] # "
+[root@oracle ~] # export PS1="[\u@\h \W] # "
+[root@oracle ~] # cd /usr/
+[root@oracle usr] # cd /usr/local/
+[root@oracle local] # export PS1="[\u@\h \w] # "
+[root@oracle /usr/local] # 
+[root@oracle ~]# export PS1="[\u 我是谁] $ "
+[root@oracle /usr/local] # export PS1='[\u@\h \W]# '
+
+[root 我是谁] $ 
+PS2
+[root@oracle ~]# export PS2='HAHA'
+[root@oracle ~]# cat <<EOF
+HAHAASDF
+HAHAASDF
+HAHAASDF
+HAHAASDF
+HAHAASDF
+HAHAASDF
+HAHAEOF
+ASDF
+ASDF
+ASDF
+ASDF
+ASDF
+ASDF
+[root@oracle ~]# export PS2='>'
+
+37.source命令
+source命令，让配置文件生效或者导入其他文件内容
+
+source 文件路径 #让修改的该文件生效
+
+38.sudo命令
+
+sudo命令的配置
+在/etc/sudoers文件中添加一行配置（root）
+root    ALL=(ALL)       ALL
+user1   ALL=(ALL)       ALL
